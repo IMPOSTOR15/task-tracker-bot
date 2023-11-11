@@ -2,9 +2,8 @@ import aiogram
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.callback_data import CallbackData
 
-from markups import back_button
+from markups import back_button, menu_cd
 task_cd = CallbackData("task", "action")
-
 
 
 async def task_work_keyboard():
@@ -98,4 +97,18 @@ async def task_refresh_content_keyboard():
     keyboard.add(specifications_refresh_task_btn)
     keyboard.add(seo_refresh_task_btn)
     keyboard.add(back_button(action_name = "task"))
+    return keyboard
+
+async def task_confirm_keyboard():
+    keyboard = InlineKeyboardMarkup()
+    confirm_btn = InlineKeyboardButton("Подтвердить", callback_data=task_cd.new(action="task_confirm"))
+    again_btn = InlineKeyboardButton("Заполнить заново", callback_data=menu_cd.new(action="back"))
+    keyboard.add(confirm_btn)
+    keyboard.add(again_btn)
+    return keyboard
+
+async def task_writed_kayboard():
+    keyboard = InlineKeyboardMarkup()
+    again_btn = InlineKeyboardButton("Вернуться в меню", callback_data=menu_cd.new(action="back"))
+    keyboard.add(again_btn)
     return keyboard
