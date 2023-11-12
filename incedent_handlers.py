@@ -5,6 +5,7 @@ from aiogram.utils.callback_data import CallbackData
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, InputFile, ParseMode
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
+from dbtools import insert_incedent
 
 from incedent_markups import *
 from main import bot
@@ -101,7 +102,7 @@ async def description_incedent_input_without_description(query: CallbackQuery, u
         "Пожалуйста, удостоверьтесь в правильности собранных данных:\n"
         f"⚪️ Тип инцидента: {incedent_info['type']}\n"
         f"⚪️ Категория работы: {incedent_info['work_category']}\n"
-        f"⚪️ Описание инцидента: -"
+        f"⚪️ Описание инцидента: {incedent_info['incedent_description']}"
     )
     keyboard_markup = await incedent_confirm_keyboard()
     await query.message.edit_text(
@@ -112,7 +113,7 @@ async def description_incedent_input_without_description(query: CallbackQuery, u
 async def confirmed_incedent(query: CallbackQuery, user_data, **kwargs):
 
     # Добавить логику по добавлению инцедента в бд и отправки уведомления и гугл таблица тоже
-
+    await insert_incedent(**incedent_info)
     keyboard_markup = await incedent_writed_kayboard()
     await query.message.edit_text(
         text="Инцедент успешно добавлен",

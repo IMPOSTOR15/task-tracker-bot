@@ -1,6 +1,8 @@
 import os
 from aiogram import types
+from dbtools import insert_file_document, insert_file_photo
 from main import bot, SAVE_PATH
+import secrets
 
 async def process_media(message: types.Message, task_info):
     """
@@ -10,31 +12,29 @@ async def process_media(message: types.Message, task_info):
     :param task_info: Словарь данных пользователя для сохранения путей к файлам.
     :return: Обновленный task_info с путями к фото и документам.
     """
-    # Обработка фотографий
     if message.photo:
-        # Получаем фотографию с самым высоким разрешением
         highest_resolution_photo = message.photo[-1]
         photo_path = await save_file(highest_resolution_photo.file_id, message.from_user.id)
+        await insert_file_photo(file_path = photo_path)
         if "photo_paths" not in task_info:
             task_info["photo_paths"] = []
         task_info["photo_paths"].append(photo_path)
-    else:
-        task_info["photo_paths"] = '-'
-    # Обработка документа
+
     if message.document:
         document_path = await save_file(message.document.file_id, message.from_user.id)
-
+        await insert_file_document(file_path = document_path)
         if "document_paths" not in task_info:
             task_info["document_paths"] = []
         task_info["document_paths"].append(document_path)
-    else:
-        task_info["document_path"] = '-'
+
     print('файлы сохранены')
     return task_info
 
 async def save_file(file_id, user_id):
     file_info = await bot.get_file(file_id)
     file_path = file_info.file_path
-    destination = f"{SAVE_PATH}{user_id}/{user_id}_{os.path.basename(file_path)}"
+    random_suffix = secrets.token_hex(8)  # Генерация случайной строки из 16 символов (8 байт в hex)
+    destination = f"{SAVE_PATH}{user_id}/{user_id}_{os.path.basename(file_path)}_{random_suffix}"
+
     await bot.download_file(file_path, destination)
     return destination

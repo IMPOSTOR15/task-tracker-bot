@@ -1,6 +1,5 @@
 #Ожидание ссылок на конкурентов
 from aiogram import types
-
 from aiogram.types import CallbackQuery
 
 from task_markups import *

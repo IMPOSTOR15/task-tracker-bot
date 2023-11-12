@@ -102,9 +102,9 @@ async def input_text_content_refresh_file_handler(message: types.Message, user_d
 #Ожидание описания задачи
 async def input_text_content_refresh_description_handler_without_data(query: CallbackQuery, user_data, **kwargs):
     if 'photo_paths' not in task_info:
-        task_info['photo_paths'] = ["-"]
-    if 'document_path' not in task_info:
-        task_info['document_path'] = ["-"]
+        task_info['photo_paths'] = []
+    if 'document_paths' not in task_info:
+        task_info['document_paths'] = []
 
     user_data[query.from_user.id] = {
         "current_message": "text_content_refresh_description",
@@ -132,7 +132,7 @@ async def input_text_content_refresh_confirmation_handler(message: types.Message
         f"⚪️ Тип задачи: {task_info['task_action']}\n"
         f"⚪️ Ссылки на товары: {task_info['goods_info']}\n"
         f"⚪️ Фото товаров: {task_info['photo_paths']}\n"
-        f"⚪️ Документы: {task_info['document_path']}\n"
+        f"⚪️ Документы: {task_info['document_paths']}\n"
         f"⚪️ Описание задачи: {task_info['task_description']}"
     )
 
@@ -154,7 +154,7 @@ async def text_content_refresh_confirmation_handler_without_description(query: C
         f"⚪️ Тип задачи: {task_info['task_action']}\n"
         f"⚪️ Ссылки на товары: {task_info['goods_info']}\n"
         f"⚪️ Фото товаров: {task_info['photo_paths']}\n"
-        f"⚪️ Документы: {task_info['document_path']}\n"
+        f"⚪️ Документы: {task_info['document_paths']}\n"
         f"⚪️ Описание задачи: {task_info['task_description']}"
     )
 

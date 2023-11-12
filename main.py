@@ -1,23 +1,22 @@
 import asyncio
 from dotenv import load_dotenv
 import os
-import aiogram
 from aiogram import Bot, Dispatcher, types
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.types import CallbackQuery
-from aiogram.dispatcher.filters import Command
-from aiogram.utils.callback_data import CallbackData
+from dbtools import init_db, create_pool
 
 load_dotenv()
-
+# python pip install python-dotenv aiogram asyncio gspread oauth2client asyncpg
 bot_token = os.getenv('BOT_TOKEN')
+DATABASE_URL = os.getenv("DATABASE_URL")
+SAVE_PATH = os.getenv('STATIC_PATH')
+SHEET_URL = os.getenv('SHEET_URL')
+
 if not bot_token:
     raise ValueError("No BOT_TOKEN found in your environment variables.")
 
 bot = Bot(token=bot_token)
 dp = Dispatcher(bot)
-print(dp)
-SAVE_PATH = './static-files/'
 
 from markups import *
 from incedent_handlers import *
@@ -36,7 +35,7 @@ from tasks_handlers_categories.finance.financial_performance_report import *
 from tasks_handlers_categories.shipment.shipment_turnover_report import *
 from tasks_handlers_categories.shipment.shipment_report_warehouses import *
 from tasks_handlers_categories.shipment.shipment_create_delivery import *
-
+#Добавить здесь импорты создания поставки
 from tasks_handlers_categories.shipment.shipment_acceptance_control import *
 # Импорты контента
 from tasks_handlers_categories.content.content_card_analysis import *
@@ -398,6 +397,12 @@ async def process_shipment_create_delivery_confirmation_handler_without_descript
 
 
 
+
+
+
+
+
+
 #Контроль приемки
 @dp.callback_query_handler(task_cd.filter(action="acceptance_control_shipment"))
 async def process_shipment_acceptance_control_date_handler(query: CallbackQuery, callback_data: dict, **kwargs):
@@ -599,7 +604,12 @@ async def process_confirm_task(query: CallbackQuery, callback_data: dict, **kwar
 
 
 async def main():
+    # asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    await create_pool()
+    await init_db()
     await dp.start_polling()
+    
+
 
 if __name__ == '__main__':
     asyncio.run(main())

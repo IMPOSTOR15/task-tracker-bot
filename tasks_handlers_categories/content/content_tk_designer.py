@@ -54,13 +54,13 @@ async def input_content_tk_designer_date_handler(message: types.Message, user_da
         "last_bot_message_id": sent_message.message_id
     }
 
-#Если дат не ввели
+#Если данных не ввели
 #Ожидание описания задачи
 async def input_content_tk_designer_description_handler_without_date(query: CallbackQuery, user_data, **kwargs):
     if 'photo_paths' not in task_info:
-        task_info['photo_paths'] = "-"
-    if 'document_path' not in task_info:
-        task_info['document_path'] = "-"
+        task_info['photo_paths'] = []
+    if 'document_paths' not in task_info:
+        task_info['document_paths'] = []
 
     user_data[query.from_user.id] = {
         "current_message": "content_tk_designer_description",

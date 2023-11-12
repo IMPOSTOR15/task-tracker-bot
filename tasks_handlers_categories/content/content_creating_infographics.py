@@ -12,6 +12,7 @@ from task_handlers import task_info
 
 async def content_creating_infographics_date_handler(query: CallbackQuery, user_data, **kwargs):
     task_info["photo_paths"] = []
+    task_info['document_paths'] = []
     
     task_info["task_subcategory"] = "Создание инфографики"
     user_data[query.from_user.id] = {
@@ -54,9 +55,9 @@ async def input_content_creating_infographics_date_handler(message: types.Messag
 #Ожидание описания задачи
 async def input_content_creating_infographics_description_handler_without_date(query: CallbackQuery, user_data, **kwargs):
     if 'photo_paths' not in task_info:
-        task_info['photo_paths'] = "-"
-    if 'document_path' not in task_info:
-        task_info['document_path'] = "-"
+        task_info['photo_paths'] = []
+    if 'document_paths' not in task_info:
+        task_info['document_paths'] = []
 
     user_data[query.from_user.id] = {
         "current_message": "content_creating_infographics_description",
@@ -84,7 +85,7 @@ async def input_content_creating_infographics_description_handler(message: types
         f"⚪️ Подкатегория задачи: {task_info['task_subcategory']}\n"
         f"⚪️ Ссылки на товары: {task_info['goods_info']}\n"
         f"⚪️ Фото товаров: {task_info['photo_paths']}\n"
-        f"⚪️ Документы: {task_info['document_path']}\n"
+        f"⚪️ Документы: {task_info['document_paths']}\n"
         f"⚪️ Описание задачи: {task_info['task_description']}"
     )
 
@@ -106,7 +107,7 @@ async def content_creating_infographics_confirmation_handler_without_description
         f"⚪️ Подкатегория задачи: {task_info['task_subcategory']}\n"
         f"⚪️ Ссылки на товары: {task_info['goods_info']}\n"
         f"⚪️ Фото товаров: {task_info['photo_paths']}\n"
-        f"⚪️ Документы: {task_info['document_path']}\n"
+        f"⚪️ Документы: {task_info['document_paths']}\n"
         f"⚪️ Описание задачи: {task_info['task_description']}"
     )
 

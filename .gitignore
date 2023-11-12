@@ -1,6 +1,7 @@
 /.env
 *.pyc
 /static-files
+/credentials
 *.jpg
 *.pdf
 *.docx
