@@ -3,7 +3,7 @@ from aiogram import types
 
 from aiogram.utils.callback_data import CallbackData
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, InputFile
-from dbtools import insert_task, mark_task_id_file
+from dbtools import get_sheet_name_by_chat_id, insert_task, mark_task_id_file
 from google_sheets.google_sheets_tools import add_row_to_sheet
 
 from task_markups import *
@@ -86,7 +86,9 @@ async def confirmed_task(query: CallbackQuery, user_data, **kwargs):
                 print(document_path)
                 await mark_task_id_file(task_id = current_task_id, file_path = document_path)
         # зАПИСЬ ЯЧЕЙКИ
-        add_row_to_sheet(SHEET_URL, 'Рабочие задачи Бабаназаров', task_info_data)
+        
+        sheet_name = await get_sheet_name_by_chat_id(chat_id)
+        add_row_to_sheet(SHEET_URL, sheet_name, task_info_data)
 
         await query.message.edit_text(
             text="Задача успешно добавлена",

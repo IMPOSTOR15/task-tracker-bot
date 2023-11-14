@@ -12,6 +12,7 @@ async def process_media(message: types.Message, task_info):
     :param task_info: Словарь данных пользователя для сохранения путей к файлам.
     :return: Обновленный task_info с путями к фото и документам.
     """
+    print('process media')
     if message.photo:
         highest_resolution_photo = message.photo[-1]
         photo_path = await save_file(highest_resolution_photo.file_id, message.from_user.id)
@@ -34,7 +35,7 @@ async def save_file(file_id, user_id):
     file_info = await bot.get_file(file_id)
     file_path = file_info.file_path
     random_suffix = secrets.token_hex(8)  # Генерация случайной строки из 16 символов (8 байт в hex)
-    destination = f"{SAVE_PATH}{user_id}/{user_id}_{os.path.basename(file_path)}_{random_suffix}"
+    destination = f"{SAVE_PATH}{user_id}/{user_id}_{random_suffix}_{os.path.basename(file_path)}"
 
     await bot.download_file(file_path, destination)
     return destination

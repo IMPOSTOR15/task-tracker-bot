@@ -51,7 +51,43 @@ async def init_db():
                 incedent_description TEXT
             )
         """)
+        await conn.execute("""
+            CREATE TABLE IF NOT EXISTS chats (
+                id BIGINT PRIMARY KEY,
+                chat_id BIGINT,
+                admin_id BIGINT,
+                sheet_name TEXT
+            )
+        """)
 
+async def insert_chat_sheet(chat_id: int, sheet_name: str, admin_id: int):
+    async with PoolConnection() as conn:
+        await conn.execute(
+            """
+            INSERT INTO chats (chat_id, admin_id, sheet_name)
+            VALUES ($1, $2, $3)
+            ON CONFLICT (chat_id) DO UPDATE
+            SET admin_id = EXCLUDED.admin_id,
+                sheet_name = EXCLUDED.sheet_name
+            """,
+            chat_id,
+            admin_id,
+            sheet_name
+        )
+        
+async def get_sheet_name_by_chat_id(chat_id: int):
+    async with PoolConnection() as conn:
+        row = await conn.fetchrow(
+            """
+            SELECT sheet_name FROM chats
+            WHERE chat_id = $1
+            """,
+            chat_id
+        )
+        if row:
+            return row['sheet_name']
+        else:
+            return None
 
 async def insert_task(
         task_category: str = "-",

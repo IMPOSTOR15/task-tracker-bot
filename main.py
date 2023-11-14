@@ -1,9 +1,10 @@
 import asyncio
 from dotenv import load_dotenv
 import os
+import shlex
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import CallbackQuery
-from dbtools import init_db, create_pool
+from dbtools import init_db, create_pool, insert_chat_sheet
 
 load_dotenv()
 # python pip install python-dotenv aiogram asyncio gspread oauth2client asyncpg
@@ -68,6 +69,23 @@ async def back_to_main_menu(query: CallbackQuery):
                                      "\nВыбери какой тип задачи тебя интерсует",
                                 reply_markup=keyboard_markup)
     await query.answer()
+
+@dp.message_handler(commands=['registration'])
+async def cmd_start(message: types.Message):
+    args = shlex.split(message.get_args())
+    if args:
+        seller_sheet_name = args[0]  # Первый аргумент после команды
+        chat_id = message.chat.id
+        user_id = message.from_user.id
+
+        try:
+            await insert_chat_sheet(chat_id, seller_sheet_name, user_id)
+            await bot.send_message(chat_id=chat_id, text=f"Лист селлера '{seller_sheet_name}' зарегистрирован в этом чате.")
+        except Exception as e:
+            await bot.send_message(chat_id=chat_id, text=f"Ошибка при регистрации листа селлера: '{seller_sheet_name}'. \n {e}")
+    else:
+        await bot.send_message(chat_id=message.chat.id, text="Пожалуйста, укажите название листа селлера после команды.")
+
 
 
 # Инцеденты
@@ -462,6 +480,7 @@ async def process_content_tk_photographer_date_handler(query: CallbackQuery, cal
 
 @dp.message_handler(lambda message: message.from_user.id in user_data and user_data[message.from_user.id].get("current_message") == "content_tk_photographer_date", content_types=['text', 'photo', 'document'])
 async def process_input_content_tk_photographer_date_handler(message: types.Message, **kwargs):
+    print('start handler')
     await input_content_tk_photographer_date_handler(message, user_data, **kwargs)
 
 @dp.callback_query_handler(task_cd.filter(action="task_content_tk_photographer_continue_no_date"))
