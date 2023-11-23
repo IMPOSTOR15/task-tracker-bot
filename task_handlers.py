@@ -10,45 +10,56 @@ from task_markups import *
 from main import SHEET_URL, bot
 
 task_info = {}
+task_group_text = """
+Аналитика - группа задач связанная с проведением различных аналитических мероприятий.
 
+Финансы - группа задач связанная с подготовкой и предоставлением отчетности для продавца.
+
+Поставки - группа задач связанная с отчетностью и процессом поставок товаров на склады маркетплейса.
+
+Контент - группа задач связанных с созданием, оформлением, изменением карточек товаров.
+
+Обновить текстовый контент - задачи связанные с изменение текстового контента (название, описание, характеристики, SEO) в карточке товара.
+
+"""
 async def task_work_handler(query: CallbackQuery, user_data, **kwargs):
     keyboard_markup = await task_work_keyboard()
-    await query.message.edit_text(text="Выберите группу задачи", reply_markup=keyboard_markup)
+    await query.message.edit_text(text=f"{task_group_text}Выберите группу задачи", reply_markup=keyboard_markup)
     await query.answer()
 
 async def task_analitic_handler(query: CallbackQuery, user_data, **kwargs):
     task_info["task_category"] = "Аналитика"
     user_data["prev_action"] = "task_analitic"
     keyboard_markup = await task_analitic_keyboard()
-    await query.message.edit_text(text="Группа задач связанная с проведением различных аналитических мероприятий. \n Выберите подзадачу", reply_markup=keyboard_markup)
+    await query.message.edit_text(text="Группа задач связанная с проведением различных аналитических мероприятий.\n\nВыберите подзадачу", reply_markup=keyboard_markup)
     await query.answer()
 
 async def task_finance_handler(query: CallbackQuery, user_data, **kwargs):
     task_info["task_category"] = "Финансы"
     user_data["prev_action"] = "task_finance"
     keyboard_markup = await task_finance_keyboard()
-    await query.message.edit_text(text="Группа задач связанная с подготовкой и предоставлением отчетности для продавца. \n Выберите подзадачу", reply_markup=keyboard_markup)
+    await query.message.edit_text(text="Группа задач связанная с подготовкой и предоставлением отчетности для продавца.\n\nВыберите подзадачу", reply_markup=keyboard_markup)
     await query.answer()
 
 async def task_shipment_handler(query: CallbackQuery, user_data, **kwargs):
     task_info["task_category"] = "Поставки"
     user_data["prev_action"] = "task_delivery"
     keyboard_markup = await task_shipment_keyboard()
-    await query.message.edit_text(text="Группа задач связанная с отчетностью и процессом поставок товаров на склады маркетплейса. \n Выберите подзадачу", reply_markup=keyboard_markup)
+    await query.message.edit_text(text="Группа задач связанная с отчетностью и процессом поставок товаров на склады маркетплейса.\n\nВыберите подзадачу", reply_markup=keyboard_markup)
     await query.answer()
 
 async def task_content_handler(query: CallbackQuery, user_data, **kwargs):
     task_info["task_category"] = "Контент"
     user_data["prev_action"] = "task_content"
     keyboard_markup = await task_content_keyboard()
-    await query.message.edit_text(text="Группа задач связанных с созданием, оформлением, изменением карточек товаров. \n Выберите подзадачу", reply_markup=keyboard_markup)
+    await query.message.edit_text(text="Группа задач связанных с созданием, оформлением, изменением карточек товаров.\n\nВыберите подзадачу", reply_markup=keyboard_markup)
     await query.answer()
 
 async def task_refresh_content_handler(query: CallbackQuery, user_data, **kwargs):
     task_info["task_category"] = "Обновление контента"
     user_data["prev_action"] = "task_refresh_content"
     keyboard_markup = await task_refresh_content_keyboard()
-    await query.message.edit_text(text="Задачи связанные с изменение текстового контента. \n Выберите подзадачу", reply_markup=keyboard_markup)
+    await query.message.edit_text(text="Задачи связанные с изменение текстового контента.\n\nВыберите подзадачу", reply_markup=keyboard_markup)
     await query.answer()
 
 
@@ -72,18 +83,16 @@ async def confirmed_task(query: CallbackQuery, user_data, **kwargs):
         "warehouse":  "-",
     }
 
-    task_info_data = {k: v for k, v in {**task_info_defaults, **task_info}.items() if k not in ['photo_paths', 'document_paths']}
-
+    task_info_data_to_db = {k: v for k, v in {**task_info_defaults, **task_info}.items() if k not in ['photo_paths', 'document_paths']}
+    task_info_data = {k: v for k, v in {**task_info_defaults, **task_info}.items()}
     try:
-        current_task_id = await insert_task(**task_info_data)
+        current_task_id = await insert_task(**task_info_data_to_db)
         if "photo_paths" in task_info:
             for photo_path in task_info["photo_paths"]:
-                print(photo_path)
                 await mark_task_id_file(task_id = current_task_id, file_path = photo_path)
 
         if "document_paths" in task_info:
             for document_path in task_info["document_paths"]:
-                print(document_path)
                 await mark_task_id_file(task_id = current_task_id, file_path = document_path)
         # зАПИСЬ ЯЧЕЙКИ
         
@@ -96,6 +105,6 @@ async def confirmed_task(query: CallbackQuery, user_data, **kwargs):
         )
     except Exception as e:
         await query.message.edit_text(
-            text=f"Ошибка добавления задачи: \n{e}",
+            text=f"Ошибка добавления задачи: \n{e.message}",
             reply_markup=keyboard_markup
         )

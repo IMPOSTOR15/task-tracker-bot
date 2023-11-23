@@ -60,19 +60,29 @@ async def init_db():
             )
         """)
 
-async def insert_chat_sheet(chat_id: int, sheet_name: str, admin_id: int):
+async def get_chat_sheet(chat_id: int):
+    async with PoolConnection() as conn:
+        row = await conn.fetchrow(
+            "SELECT sheet_name, table_link FROM chats WHERE chat_id = $1", chat_id
+        )
+        return row  # Возвращает None, если запись отсутствует
+
+
+async def insert_chat_sheet(chat_id: int, sheet_name: str, admin_id: int, table_link: str):
     async with PoolConnection() as conn:
         await conn.execute(
             """
-            INSERT INTO chats (chat_id, admin_id, sheet_name)
-            VALUES ($1, $2, $3)
+            INSERT INTO chats (chat_id, admin_id, sheet_name, table_link)
+            VALUES ($1, $2, $3, $4)
             ON CONFLICT (chat_id) DO UPDATE
             SET admin_id = EXCLUDED.admin_id,
-                sheet_name = EXCLUDED.sheet_name
+                sheet_name = EXCLUDED.sheet_name,
+                table_link = EXCLUDED.table_link
             """,
             chat_id,
             admin_id,
-            sheet_name
+            sheet_name,
+            table_link
         )
         
 async def get_sheet_name_by_chat_id(chat_id: int):

@@ -67,10 +67,10 @@ async def input_shipment_acceptance_control_description_handler(message: types.M
 
     confirmation_message = (
         "Пожалуйста, удостоверьтесь в правильности собранных данных:\n"
-        f"⚪️ Категория задачи: {task_info['task_category']}\n"
-        f"⚪️ Подкатегория задачи: {task_info['task_subcategory']}\n"
-        f"⚪️ Период задачи: {task_info['task_date']}\n"
-        f"⚪️ Описание задачи: {task_info['task_description']}"
+        f"\n⚪️ Категория задачи: {task_info['task_category']}\n"
+        f"\n⚪️ Подкатегория задачи: {task_info['task_subcategory']}\n"
+        f"\n⚪️ Период задачи: {task_info['task_date']}\n"
+        f"\n⚪️ Описание задачи: {task_info['task_description']}"
     )
 
     keyboard_markup = await task_confirm_keyboard()
@@ -87,10 +87,10 @@ async def shipment_acceptance_control_confirmation_handler_without_description(q
 
     confirmation_message = (
         "Пожалуйста, удостоверьтесь в правильности собранных данных:\n"
-        f"⚪️ Категория задачи: {task_info['task_category']}\n"
-        f"⚪️ Подкатегория задачи: {task_info['task_subcategory']}\n"
-        f"⚪️ Период задачи: {task_info['task_date']}\n"
-        f"⚪️ Описание задачи: {task_info['task_description']}"
+        f"\n⚪️ Категория задачи: {task_info['task_category']}\n"
+        f"\n⚪️ Подкатегория задачи: {task_info['task_subcategory']}\n"
+        f"\n⚪️ Период задачи: {task_info['task_date']}\n"
+        f"\n⚪️ Описание задачи: {task_info['task_description']}"
     )
 
     keyboard_markup = await task_confirm_keyboard()

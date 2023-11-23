@@ -9,6 +9,9 @@ from tasks_handlers_categories.finance.markups_templates.financial_performance_r
 from main import bot
 from task_handlers import task_info
 
+report_description_text = """
+В отчете отражается влияние проведенных за период изменений (например, повышение цены) на финансовые показатели (например, маржинальная выручка за период).
+"""
 async def financial_performance_report_date_handler(query: CallbackQuery, user_data, **kwargs):
     task_info["task_subcategory"] = "Отчет о проделанной работе в разрезе финансовых показателей"
     user_data[query.from_user.id] = {
@@ -18,7 +21,7 @@ async def financial_performance_report_date_handler(query: CallbackQuery, user_d
     keyboard_markup = await financial_performance_report_date_keyboard(user_data["prev_action"])
     user_data["prev_action"] = "report_section_financial"
 
-    await query.message.edit_text(text="Выберите дату начала периода отчета и Выберите дату конца периода отчета.\n Пример: 09.09.2023 - 18.09.2023", reply_markup=keyboard_markup)
+    await query.message.edit_text(text=f"{report_description_text}\nВыберите дату начала периода отчета и Выберите дату конца периода отчета.\n Пример: 09.09.2023 - 18.09.2023", reply_markup=keyboard_markup)
     await query.answer()
 
 #Получение даты анализа
@@ -67,10 +70,10 @@ async def input_financial_performance_report_description_handler(message: types.
 
     confirmation_message = (
         "Пожалуйста, удостоверьтесь в правильности собранных данных:\n"
-        f"⚪️ Категория задачи: {task_info['task_category']}\n"
-        f"⚪️ Подкатегория задачи: {task_info['task_subcategory']}\n"
-        f"⚪️ Период задачи: {task_info['task_date']}\n"
-        f"⚪️ Описание задачи: {task_info['task_description']}"
+        f"\n⚪️ Категория задачи: {task_info['task_category']}\n"
+        f"\n⚪️ Подкатегория задачи: {task_info['task_subcategory']}\n"
+        f"\n⚪️ Период задачи: {task_info['task_date']}\n"
+        f"\n⚪️ Описание задачи: {task_info['task_description']}"
     )
 
     keyboard_markup = await task_confirm_keyboard()
@@ -87,10 +90,10 @@ async def financial_performance_report_confirmation_handler_without_description(
 
     confirmation_message = (
         "Пожалуйста, удостоверьтесь в правильности собранных данных:\n"
-        f"⚪️ Категория задачи: {task_info['task_category']}\n"
-        f"⚪️ Подкатегория задачи: {task_info['task_subcategory']}\n"
-        f"⚪️ Период задачи: {task_info['task_date']}\n"
-        f"⚪️ Описание задачи: {task_info['task_description']}"
+        f"\n⚪️ Категория задачи: {task_info['task_category']}\n"
+        f"\n⚪️ Подкатегория задачи: {task_info['task_subcategory']}\n"
+        f"\n⚪️ Период задачи: {task_info['task_date']}\n"
+        f"\n⚪️ Описание задачи: {task_info['task_description']}"
     )
 
     keyboard_markup = await task_confirm_keyboard()

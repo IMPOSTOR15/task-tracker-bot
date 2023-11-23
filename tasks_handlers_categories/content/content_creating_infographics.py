@@ -10,6 +10,8 @@ from tasks_handlers_categories.content.markups_templates.content_creating_infogr
 from main import bot
 from task_handlers import task_info
 
+import asyncio
+
 async def content_creating_infographics_date_handler(query: CallbackQuery, user_data, **kwargs):
     task_info["photo_paths"] = []
     task_info['document_paths'] = []
@@ -27,29 +29,42 @@ async def content_creating_infographics_date_handler(query: CallbackQuery, user_
     )
     await query.answer()
 
+
 async def input_content_creating_infographics_date_handler(message: types.Message, user_data, **kwargs):
     global task_info
+    is_last_in_album = False
+
     if message.text:
         task_info["goods_info"] = message.text
     else:
         task_info["goods_info"] = '-'
-    #Обработка медиа в сообщении
+    
+    # Обработка медиа в сообщении
     task_info = await process_media(message, task_info)
 
-    if "last_bot_message_id" in user_data[message.from_user.id]:
-        await bot.delete_message(chat_id=message.chat.id, message_id=user_data[message.from_user.id]["last_bot_message_id"])
-        del user_data[message.from_user.id]["last_bot_message_id"]
+    # Check if the message is the last in its album
+    if not message.media_group_id or message.media_group_id != user_data.get("last_media_group_id", None):
+        is_last_in_album = True
+        user_data["last_media_group_id"] = message.media_group_id
 
-    keyboard_markup = await content_creating_infographics_goods_info_keyboard(user_data["prev_action"])
-    sent_message = await bot.send_message(
-        chat_id=message.chat.id,
-        text="Данные записаны.\nДобавьте другие файлы и/или информацию при необходимости",
-        reply_markup=keyboard_markup
-    )
-    user_data[message.from_user.id] = {
-        "current_message": "content_creating_infographics_date",
-        "last_bot_message_id": sent_message.message_id
-    }
+
+    if is_last_in_album:
+
+        if "last_bot_message_id" in user_data[message.from_user.id]:
+            await bot.delete_message(chat_id=message.chat.id, message_id=user_data[message.from_user.id]["last_bot_message_id"])
+            del user_data[message.from_user.id]["last_bot_message_id"]
+    
+        keyboard_markup = await content_creating_infographics_goods_info_keyboard(user_data["prev_action"])
+        sent_message = await bot.send_message(
+            chat_id=message.chat.id,
+            text="Данные записаны.\nДобавьте другие файлы и/или информацию при необходимости",
+            reply_markup=keyboard_markup
+        )
+        user_data[message.from_user.id] = {
+            "current_message": "content_creating_infographics_date",
+            "last_bot_message_id": sent_message.message_id
+        }
+
 
 #Если дат не ввели
 #Ожидание описания задачи
@@ -81,12 +96,12 @@ async def input_content_creating_infographics_description_handler(message: types
 
     confirmation_message = (
         "Пожалуйста, удостоверьтесь в правильности собранных данных:\n"
-        f"⚪️ Категория задачи: {task_info['task_category']}\n"
-        f"⚪️ Подкатегория задачи: {task_info['task_subcategory']}\n"
-        f"⚪️ Ссылки на товары: {task_info['goods_info']}\n"
-        f"⚪️ Фото товаров: {task_info['photo_paths']}\n"
-        f"⚪️ Документы: {task_info['document_paths']}\n"
-        f"⚪️ Описание задачи: {task_info['task_description']}"
+        f"\n⚪️ Категория задачи: {task_info['task_category']}\n"
+        f"\n⚪️ Подкатегория задачи: {task_info['task_subcategory']}\n"
+        f"\n⚪️ Ссылки на товары: {task_info['goods_info']}\n"
+        f"\n⚪️ Фото товаров: {task_info['photo_paths']}\n"
+        f"\n⚪️ Документы: {task_info['document_paths']}\n"
+        f"\n⚪️ Описание задачи: {task_info['task_description']}"
     )
 
     keyboard_markup = await task_confirm_keyboard()
@@ -103,12 +118,12 @@ async def content_creating_infographics_confirmation_handler_without_description
 
     confirmation_message = (
         "Пожалуйста, удостоверьтесь в правильности собранных данных:\n"
-        f"⚪️ Категория задачи: {task_info['task_category']}\n"
-        f"⚪️ Подкатегория задачи: {task_info['task_subcategory']}\n"
-        f"⚪️ Ссылки на товары: {task_info['goods_info']}\n"
-        f"⚪️ Фото товаров: {task_info['photo_paths']}\n"
-        f"⚪️ Документы: {task_info['document_paths']}\n"
-        f"⚪️ Описание задачи: {task_info['task_description']}"
+        f"\n⚪️ Категория задачи: {task_info['task_category']}\n"
+        f"\n⚪️ Подкатегория задачи: {task_info['task_subcategory']}\n"
+        f"\n⚪️ Ссылки на товары: {task_info['goods_info']}\n"
+        f"\n⚪️ Фото товаров: {task_info['photo_paths']}\n"
+        f"\n⚪️ Документы: {task_info['document_paths']}\n"
+        f"\n⚪️ Описание задачи: {task_info['task_description']}"
     )
 
     keyboard_markup = await task_confirm_keyboard()
@@ -116,4 +131,3 @@ async def content_creating_infographics_confirmation_handler_without_description
         text=confirmation_message,
         reply_markup=keyboard_markup
     )
-    print(task_info)

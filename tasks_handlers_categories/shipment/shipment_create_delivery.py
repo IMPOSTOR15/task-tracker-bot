@@ -54,10 +54,10 @@ async def input_shipment_create_delivery_description_handler(message: types.Mess
 
     confirmation_message = (
         "Пожалуйста, удостоверьтесь в правильности собранных данных:\n"
-        f"⚪️ Категория задачи: {task_info['task_category']}\n"
-        f"⚪️ Подкатегория задачи: {task_info['task_subcategory']}\n"
-        f"⚪️ Склад поставки: {task_info['warehouse']}\n"
-        f"⚪️ Описание задачи: {task_info['task_description']}"
+        f"\n⚪️ Категория задачи: {task_info['task_category']}\n"
+        f"\n⚪️ Подкатегория задачи: {task_info['task_subcategory']}\n"
+        f"\n⚪️ Склад поставки: {task_info['warehouse']}\n"
+        f"\n⚪️ Описание задачи: {task_info['task_description']}"
     )
 
     keyboard_markup = await task_confirm_keyboard()
@@ -74,10 +74,10 @@ async def shipment_create_delivery_confirmation_handler_without_description(quer
 
     confirmation_message = (
         "Пожалуйста, удостоверьтесь в правильности собранных данных:\n"
-        f"⚪️ Категория задачи: {task_info['task_category']}\n"
-        f"⚪️ Подкатегория задачи: {task_info['task_subcategory']}\n"
-        f"⚪️ Склад поставки: {task_info['warehouse']}\n"
-        f"⚪️ Описание задачи: {task_info['task_description']}"
+        f"\n⚪️ Категория задачи: {task_info['task_category']}\n"
+        f"\n⚪️ Подкатегория задачи: {task_info['task_subcategory']}\n"
+        f"\n⚪️ Склад поставки: {task_info['warehouse']}\n"
+        f"\n⚪️ Описание задачи: {task_info['task_description']}"
     )
 
     keyboard_markup = await task_confirm_keyboard()

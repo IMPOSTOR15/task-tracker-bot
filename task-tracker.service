@@ -1,0 +1,13 @@
+[Unit]
+Description=task tracker telegram bot
+After=multi-user.target
+
+[Service]
+Type=simple
+User=root
+Restart=always
+WorkingDirectory=/home/task-tracker
+ExecStart=/usr/bin/python3 /home/task-tracker/main.py
+
+[Install]
+WantedBy=multi-user.target

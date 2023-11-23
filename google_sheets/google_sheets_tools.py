@@ -11,6 +11,7 @@ def transform_paths(paths):
     return [current_host + '/'.join(path.split('/')[2:]) for path in paths]
 
 def add_row_to_sheet(sheet_url, sheet_name, task_info):
+
     # Авторизация и получение таблицы
     scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
     creds = ServiceAccountCredentials.from_json_keyfile_name('./credentials/bot-task-tracker-2cbdc3a7ab62.json', scope)
@@ -37,7 +38,6 @@ def add_row_to_sheet(sheet_url, sheet_name, task_info):
     # Преобразование путей фотографий и документов и добавление их в основную информацию
     photo_paths = transform_paths(task_info.get('photo_paths', []))
     document_paths = transform_paths(task_info.get('document_paths', []))
-
     # Добавление URL фото и документов в combined_info
     if photo_paths:
         info_values.append('Photo URLs:\n' + '\n'.join(photo_paths))

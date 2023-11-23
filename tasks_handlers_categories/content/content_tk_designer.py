@@ -32,27 +32,39 @@ async def content_tk_designer_date_handler(query: CallbackQuery, user_data, **kw
 
 async def input_content_tk_designer_date_handler(message: types.Message, user_data, **kwargs):
     global task_info
+    is_last_in_album = False
+
     if message.text:
         task_info["goods_info"] = message.text
     else:
         task_info["goods_info"] = '-'
-    #Обработка медиа в сообщении
+    
+    # Обработка медиа в сообщении
     task_info = await process_media(message, task_info)
 
-    if "last_bot_message_id" in user_data[message.from_user.id]:
-        await bot.delete_message(chat_id=message.chat.id, message_id=user_data[message.from_user.id]["last_bot_message_id"])
-        del user_data[message.from_user.id]["last_bot_message_id"]
+    # Check if the message is the last in its album
+    if not message.media_group_id or message.media_group_id != user_data.get("last_media_group_id", None):
+        is_last_in_album = True
+        user_data["last_media_group_id"] = message.media_group_id
 
-    keyboard_markup = await content_tk_designer_goods_info_keyboard(user_data["prev_action"])
-    sent_message = await bot.send_message(
-        chat_id=message.chat.id,
-        text="Данные записаны.\nДобавьте другие файлы и/или информацию при необходимости",
-        reply_markup=keyboard_markup
-    )
-    user_data[message.from_user.id] = {
-        "current_message": "content_tk_designer_date",
-        "last_bot_message_id": sent_message.message_id
-    }
+
+    if is_last_in_album:
+
+        if "last_bot_message_id" in user_data[message.from_user.id]:
+            await bot.delete_message(chat_id=message.chat.id, message_id=user_data[message.from_user.id]["last_bot_message_id"])
+            del user_data[message.from_user.id]["last_bot_message_id"]
+    
+        keyboard_markup = await content_tk_designer_goods_info_keyboard(user_data["prev_action"])
+        sent_message = await bot.send_message(
+            chat_id=message.chat.id,
+            text="Данные записаны.\nДобавьте другие файлы и/или информацию при необходимости",
+            reply_markup=keyboard_markup
+        )
+        user_data[message.from_user.id] = {
+            "current_message": "content_tk_designer_date",
+            "last_bot_message_id": sent_message.message_id
+        }
+    
 
 #Если данных не ввели
 #Ожидание описания задачи
@@ -75,7 +87,13 @@ async def input_content_tk_designer_description_handler_without_date(query: Call
 #Получение описание задачи
 #Ожидание подтверждения
 async def input_content_tk_designer_description_handler(message: types.Message, user_data, **kwargs):
-    task_info["task_description"] = message.text
+    default_value = "-"
+
+    task_category = task_info.get('task_category', default_value)
+    task_subcategory = task_info.get('task_subcategory', default_value)
+    goods_info = task_info.get('goods_info', default_value)
+    task_description = task_info.get('task_description', default_value)
+
     await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
     if "last_bot_message_id" in user_data[message.from_user.id]:
         await bot.delete_message(chat_id=message.chat.id, message_id=user_data[message.from_user.id]["last_bot_message_id"])
@@ -83,10 +101,10 @@ async def input_content_tk_designer_description_handler(message: types.Message, 
 
     confirmation_message = (
         "Пожалуйста, удостоверьтесь в правильности собранных данных:\n"
-        f"⚪️ Категория задачи: {task_info['task_category']}\n"
-        f"⚪️ Подкатегория задачи: {task_info['task_subcategory']}\n"
-        f"⚪️ Данные о товарах: {task_info['goods_info']}\n"
-        f"⚪️ Описание задачи: {task_info['task_description']}"
+        f"\n⚪️ Категория задачи: {task_category}\n"
+        f"\n⚪️ Подкатегория задачи: {task_subcategory}\n"
+        f"\n⚪️ Данные о товарах: {goods_info}\n"
+        f"\n⚪️ Описание задачи: {task_description}"
     )
 
     keyboard_markup = await task_confirm_keyboard()
@@ -99,13 +117,19 @@ async def input_content_tk_designer_description_handler(message: types.Message, 
 #Если описание не ввели
 #Ожидание подтверждения
 async def content_tk_designer_confirmation_handler_without_description(query: CallbackQuery, user_data, **kwargs):
-    task_info["task_description"] = "-"
+    default_value = "-"
+
+    task_category = task_info.get('task_category', default_value)
+    task_subcategory = task_info.get('task_subcategory', default_value)
+    goods_info = task_info.get('goods_info', default_value)
+    task_description = task_info.get('task_description', default_value)
+
     confirmation_message = (
         "Пожалуйста, удостоверьтесь в правильности собранных данных:\n"
-        f"⚪️ Категория задачи: {task_info['task_category']}\n"
-        f"⚪️ Подкатегория задачи: {task_info['task_subcategory']}\n"
-        f"⚪️ Данные о товарах: {task_info['goods_info']}\n"
-        f"⚪️ Описание задачи: {task_info['task_description']}"
+        f"\n⚪️ Категория задачи: {task_category}\n"
+        f"\n⚪️ Подкатегория задачи: {task_subcategory}\n"
+        f"\n⚪️ Данные о товарах: {goods_info}\n"
+        f"\n⚪️ Описание задачи: {task_description}"
     )
 
     keyboard_markup = await task_confirm_keyboard()

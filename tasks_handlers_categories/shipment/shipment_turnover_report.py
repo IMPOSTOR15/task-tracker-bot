@@ -116,11 +116,11 @@ async def input_shipment_turnover_report_confirmation_handler(message: types.Mes
 
     confirmation_message = (
         "Пожалуйста, удостоверьтесь в правильности собранных данных:\n"
-        f"⚪️ Категория задачи: {task_info['task_category']}\n"
-        f"⚪️ Подкатегория задачи: {task_info['task_subcategory']}\n"
-        f"⚪️ Период задачи: {task_info['task_date']}\n"
-        f"⚪️ Выбранные артикулы: {task_info['goods_sku']}\n"
-        f"⚪️ Описание задачи: {task_info['task_description']}"
+        f"\n⚪️ Категория задачи: {task_info['task_category']}\n"
+        f"\n⚪️ Подкатегория задачи: {task_info['task_subcategory']}\n"
+        f"\n⚪️ Период задачи: {task_info['task_date']}\n"
+        f"\n⚪️ Выбранные артикулы: {task_info['goods_sku']}\n"
+        f"\n⚪️ Описание задачи: {task_info['task_description']}"
     )
 
     keyboard_markup = await task_confirm_keyboard()
@@ -137,11 +137,11 @@ async def shipment_turnover_report_confirmation_handler_without_description(quer
 
     confirmation_message = (
         "Пожалуйста, удостоверьтесь в правильности собранных данных:\n"
-        f"⚪️ Категория задачи: {task_info['task_category']}\n"
-        f"⚪️ Подкатегория задачи: {task_info['task_subcategory']}\n"
-        f"⚪️ Период задачи: {task_info['task_date']}\n"
-        f"⚪️ Выбранные артикулы: {task_info['goods_sku']}\n"
-        f"⚪️ Описание задачи: {task_info['task_description']}"
+        f"\n⚪️ Категория задачи: {task_info['task_category']}\n"
+        f"\n⚪️ Подкатегория задачи: {task_info['task_subcategory']}\n"
+        f"\n⚪️ Период задачи: {task_info['task_date']}\n"
+        f"\n⚪️ Выбранные артикулы: {task_info['goods_sku']}\n"
+        f"\n⚪️ Описание задачи: {task_info['task_description']}"
     )
 
     keyboard_markup = await task_confirm_keyboard()

@@ -1,0 +1,14 @@
+[Unit]
+Description=Node.js Project Service
+After=network.target
+
+[Service]
+Type=simple
+User=root
+Restart=always
+
+WorkingDirectory=/home/task-tracker
+ExecStart=/usr/bin/node /home/task-tracker/index.js
+
+[Install]
+WantedBy=multi-user.target

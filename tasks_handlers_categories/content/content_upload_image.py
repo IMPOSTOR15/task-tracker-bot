@@ -48,28 +48,35 @@ async def input_content_upload_image_task_type_handler(query: CallbackQuery, use
 
 async def input_content_upload_image_date_handler(message: types.Message, user_data, **kwargs):
     global task_info
+    is_last_in_album = False
+
     if message.text:
         task_info["goods_info"] = message.text
     else:
         task_info["goods_info"] = '-'
-    #Обработка медиа в сообщении
+    
+    # Обработка медиа в сообщении
     task_info = await process_media(message, task_info)
 
-    if "last_bot_message_id" in user_data[message.from_user.id]:
-        await bot.delete_message(chat_id=message.chat.id, message_id=user_data[message.from_user.id]["last_bot_message_id"])
-        del user_data[message.from_user.id]["last_bot_message_id"]
+    if not message.media_group_id or message.media_group_id != user_data.get("last_media_group_id", None):
+        is_last_in_album = True
+        user_data["last_media_group_id"] = message.media_group_id
 
-    keyboard_markup = await content_upload_image_goods_info_keyboard(user_data["prev_action"])
-    sent_message = await bot.send_message(
-        chat_id=message.chat.id,
-        text="Данные записаны.\nДобавьте другие файлы и/или информацию при необходимости",
-        reply_markup=keyboard_markup
-    )
-    user_data[message.from_user.id] = {
-        "current_message": "content_upload_image_file",
-        "last_bot_message_id": sent_message.message_id
-    }
-
+    if is_last_in_album:
+        if "last_bot_message_id" in user_data[message.from_user.id]:
+            await bot.delete_message(chat_id=message.chat.id, message_id=user_data[message.from_user.id]["last_bot_message_id"])
+            del user_data[message.from_user.id]["last_bot_message_id"]
+    
+        keyboard_markup = await content_upload_image_goods_info_keyboard(user_data["prev_action"])
+        sent_message = await bot.send_message(
+            chat_id=message.chat.id,
+            text="Данные записаны.\nДобавьте другие файлы и/или информацию при необходимости",
+            reply_markup=keyboard_markup
+        )
+        user_data[message.from_user.id] = {
+            "current_message": "content_upload_image_file",
+            "last_bot_message_id": sent_message.message_id
+        }
 #Если дат не ввели
 #Ожидание описания задачи
 async def input_content_upload_image_description_handler_without_data(query: CallbackQuery, user_data, **kwargs):
@@ -100,13 +107,13 @@ async def input_content_upload_image_confirmation_handler(message: types.Message
 
     confirmation_message = (
         "Пожалуйста, удостоверьтесь в правильности собранных данных:\n"
-        f"⚪️ Категория задачи: {task_info['task_category']}\n"
-        f"⚪️ Подкатегория задачи: {task_info['task_subcategory']}\n"
-        f"⚪️ Тип задачи: {task_info['task_action']}\n"
-        f"⚪️ Ссылки на товары: {task_info['goods_info']}\n"
-        f"⚪️ Фото товаров: {task_info['photo_paths']}\n"
-        f"⚪️ Документы: {task_info['document_paths']}\n"
-        f"⚪️ Описание задачи: {task_info['task_description']}"
+        f"\n⚪️ Категория задачи: {task_info['task_category']}\n"
+        f"\n⚪️ Подкатегория задачи: {task_info['task_subcategory']}\n"
+        f"\n⚪️ Тип задачи: {task_info['task_action']}\n"
+        f"\n⚪️ Ссылки на товары: {task_info['goods_info']}\n"
+        f"\n⚪️ Фото товаров: {task_info['photo_paths']}\n"
+        f"\n⚪️ Документы: {task_info['document_paths']}\n"
+        f"\n⚪️ Описание задачи: {task_info['task_description']}"
     )
 
     keyboard_markup = await task_confirm_keyboard()
@@ -123,13 +130,13 @@ async def content_upload_image_confirmation_handler_without_description(query: C
 
     confirmation_message = (
         "Пожалуйста, удостоверьтесь в правильности собранных данных:\n"
-        f"⚪️ Категория задачи: {task_info['task_category']}\n"
-        f"⚪️ Подкатегория задачи: {task_info['task_subcategory']}\n"
-        f"⚪️ Тип задачи: {task_info['task_action']}\n"
-        f"⚪️ Ссылки на товары: {task_info['goods_info']}\n"
-        f"⚪️ Фото товаров: {task_info['photo_paths']}\n"
-        f"⚪️ Документы: {task_info['document_paths']}\n"
-        f"⚪️ Описание задачи: {task_info['task_description']}"
+        f"\n⚪️ Категория задачи: {task_info['task_category']}\n"
+        f"\n⚪️ Подкатегория задачи: {task_info['task_subcategory']}\n"
+        f"\n⚪️ Тип задачи: {task_info['task_action']}\n"
+        f"\n⚪️ Ссылки на товары: {task_info['goods_info']}\n"
+        f"\n⚪️ Фото товаров: {task_info['photo_paths']}\n"
+        f"\n⚪️ Документы: {task_info['document_paths']}\n"
+        f"\n⚪️ Описание задачи: {task_info['task_description']}"
     )
 
     keyboard_markup = await task_confirm_keyboard()
@@ -137,4 +144,3 @@ async def content_upload_image_confirmation_handler_without_description(query: C
         text=confirmation_message,
         reply_markup=keyboard_markup
     )
-    print(task_info)

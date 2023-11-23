@@ -4,7 +4,7 @@ import os
 import shlex
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import CallbackQuery
-from dbtools import init_db, create_pool, insert_chat_sheet
+from dbtools import get_chat_sheet, init_db, create_pool, insert_chat_sheet
 
 load_dotenv()
 # python pip install python-dotenv aiogram asyncio gspread oauth2client asyncpg
@@ -70,24 +70,44 @@ async def back_to_main_menu(query: CallbackQuery):
                                 reply_markup=keyboard_markup)
     await query.answer()
 
-@dp.message_handler(commands=['registration'])
-async def cmd_start(message: types.Message):
+@dp.message_handler(commands=['registrationsheet'])
+async def cmd_register_sheet(message: types.Message):
     args = shlex.split(message.get_args())
     if args:
-        seller_sheet_name = args[0]  # Первый аргумент после команды
+        sheet_name = args[0]
         chat_id = message.chat.id
         user_id = message.from_user.id
 
+        current_data = await get_chat_sheet(chat_id)
+        table_link = current_data['table_link'] if current_data else ""
+
         try:
-            await insert_chat_sheet(chat_id, seller_sheet_name, user_id)
-            await bot.send_message(chat_id=chat_id, text=f"Лист селлера '{seller_sheet_name}' зарегистрирован в этом чате.")
+            await insert_chat_sheet(chat_id, sheet_name, user_id, table_link)
+            await bot.send_message(chat_id=chat_id, text=f"Лист селлера '{sheet_name}' зарегистрирован в этом чате.")
         except Exception as e:
-            await bot.send_message(chat_id=chat_id, text=f"Ошибка при регистрации листа селлера: '{seller_sheet_name}'. \n {e}")
+            await bot.send_message(chat_id=chat_id, text=f"Ошибка при регистрации листа селлера: '{sheet_name}'. \n {e}")
     else:
         await bot.send_message(chat_id=message.chat.id, text="Пожалуйста, укажите название листа селлера после команды.")
 
+@dp.message_handler(commands=['registrationlink'])
+async def cmd_register_link(message: types.Message):
+    args = shlex.split(message.get_args())
+    if args:
+        table_link = args[0]
+        chat_id = message.chat.id
+        user_id = message.from_user.id
 
+        current_data = await get_chat_sheet(chat_id)
+        sheet_name = current_data['sheet_name'] if current_data else ""
 
+        try:
+            await insert_chat_sheet(chat_id, sheet_name, user_id, table_link)
+            await bot.send_message(chat_id=chat_id, text=f"Ссылка '{table_link}' зарегистрирована в этом чате.")
+        except Exception as e:
+            await bot.send_message(chat_id=chat_id, text=f"Ошибка при регистрации ссылки на таблицу: '{table_link}'. \n {e}")
+    else:
+        await bot.send_message(chat_id=message.chat.id, text="Пожалуйста, укажите ссылку на таблицу после команды.")
+        
 # Инцеденты
 @dp.callback_query_handler(menu_cd.filter(action="incedent"))
 async def process_incedent_type_handler(query: CallbackQuery, callback_data: dict, **kwargs):
@@ -186,7 +206,7 @@ async def process_competitors_prices_links_handler(query: CallbackQuery, callbac
 async def process_input_competitors_prices_links_handler(message: types.Message, **kwargs):
     await input_competitors_prices_links_handler(message, user_data, **kwargs)
 
-@dp.callback_query_handler(task_cd.filter(action="task_competitors_prices_analitic_continue_without_links"))
+@dp.callback_query_handler(task_cd.filter(action="task_competitors_prices_analitic_without_links"))
 async def process_input_competitors_prices_description_handler_without_links(query: CallbackQuery, callback_data: dict, **kwargs):
     await input_competitors_prices_description_handler_without_links(query, user_data, **kwargs)
 
@@ -194,7 +214,7 @@ async def process_input_competitors_prices_description_handler_without_links(que
 async def process_input_competitors_prices_description_handler(message: types.Message, **kwargs):
     await input_competitors_prices_description_handler(message, user_data, **kwargs)
 
-@dp.callback_query_handler(task_cd.filter(action="task_competitors_prices_analitic_continue_without_description"))
+@dp.callback_query_handler(task_cd.filter(action="task_competitors_prices_analitic_without_description"))
 async def process_competitors_prices_confirmation_handler_without_description(query: CallbackQuery, callback_data: dict, **kwargs):
     await competitors_prices_confirmation_handler_without_description(query, user_data, **kwargs)
 

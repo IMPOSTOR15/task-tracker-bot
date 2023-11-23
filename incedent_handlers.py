@@ -12,19 +12,37 @@ from main import bot
 
 incedent_info = {}
 
+
+incedent_type_text = """
+Ошибка моя / моей команды. Инцидент произошел по вине продавца, представителя его команды или третьей стороны, привлеченной продавцом (например, ошибка в тексте инфографики, неверно сформированные отгрузочные документы).
+
+Ошибка менеджера. Инцидент произошел по вине нашего или привлеченного нами специалиста.
+
+Ошибка маркетплейса. Инцидент произошел по вине маркетплейса (например, технический сбой при приемке)
+
+"""
+incedent_works_text = """
+Поставки - группа ошибок, связанная с поставками на склады МП, фулфилмент или логистикой.
+
+Контент - группа ошибок, связанная с ошибками в карточках товара
+
+Аналитика - группа задач связанная с проведением различных аналитических мероприятий
+
+"""
+
 class Form(StatesGroup):
     waiting_for_incident_description = State()
 
 async def incedent_type_handler(query: CallbackQuery, user_data, **kwargs):
     keyboard_markup = await incedent_type_keyboard()
-    await query.message.edit_text(text="Выберите тип инцедента. По чьей вине произошел инцедент?", reply_markup=keyboard_markup)
+    await query.message.edit_text(text=f"{incedent_type_text}Выберите тип инцедента. По чьей вине произошел инцедент?", reply_markup=keyboard_markup)
     await query.answer()
 
 async def seller_error_incedent_handler(query: CallbackQuery, user_data, **kwargs):
     incedent_info['type'] = "Ошибка селлера"
     user_data["prev_action"] = "seller_error"
     keyboard_markup = await incedent_work_keyboard("incedent")
-    await query.message.edit_text(text="Выберите вид работ для инцедента", reply_markup=keyboard_markup)
+    await query.message.edit_text(text=f"{incedent_works_text}Выберите вид работ для инцедента", reply_markup=keyboard_markup)
     await query.answer()
 
 
@@ -32,14 +50,14 @@ async def manager_error_incedent_handler(query: CallbackQuery, user_data, **kwar
     incedent_info['type'] = "Ошибка менеджера"
     user_data["prev_action"] = "manager_error"
     keyboard_markup = await incedent_work_keyboard("incedent")
-    await query.message.edit_text(text="Выберите вид работ для инцедента", reply_markup=keyboard_markup)
+    await query.message.edit_text(text=f"{incedent_works_text}Выберите вид работ для инцедента", reply_markup=keyboard_markup)
     await query.answer()
 
 async def marketplace_error_incedent_handler(query: CallbackQuery, user_data, **kwargs):
     incedent_info['type'] = "Ошибка маркетплейса"
     user_data["prev_action"] = "marketplace_error"
     keyboard_markup = await incedent_work_keyboard("incedent")
-    await query.message.edit_text(text="Выберите вид работ для инцедента", reply_markup=keyboard_markup)
+    await query.message.edit_text(text=f"{incedent_works_text}Выберите вид работ для инцедента", reply_markup=keyboard_markup)
     await query.answer()
 
 async def shipment_incedent_handler(query: CallbackQuery, user_data, **kwargs):
@@ -81,9 +99,9 @@ async def description_incedent_input(message: types.Message, user_data, **kwargs
     print(incedent_info)
     confirmation_message = (
         "Пожалуйста, удостоверьтесь в правильности собранных данных:\n"
-        f"⚪️ Тип инцидента: {incedent_info['type']}\n"
-        f"⚪️ Категория работы: {incedent_info['work_category']}\n"
-        f"⚪️ Описание инцидента: {incedent_info['incedent_description']}"
+        f"\n⚪️ Тип инцидента: {incedent_info['type']}\n"
+        f"\n⚪️ Категория работы: {incedent_info['work_category']}\n"
+        f"\n⚪️ Описание инцидента: {incedent_info['incedent_description']}"
     )
 
     keyboard_markup = await incedent_confirm_keyboard()
@@ -100,9 +118,9 @@ async def description_incedent_input_without_description(query: CallbackQuery, u
     print(incedent_info)
     confirmation_message = (
         "Пожалуйста, удостоверьтесь в правильности собранных данных:\n"
-        f"⚪️ Тип инцидента: {incedent_info['type']}\n"
-        f"⚪️ Категория работы: {incedent_info['work_category']}\n"
-        f"⚪️ Описание инцидента: {incedent_info['incedent_description']}"
+        f"\n⚪️ Тип инцидента: {incedent_info['type']}\n"
+        f"\n⚪️ Категория работы: {incedent_info['work_category']}\n"
+        f"\n⚪️ Описание инцидента: {incedent_info['incedent_description']}"
     )
     keyboard_markup = await incedent_confirm_keyboard()
     await query.message.edit_text(

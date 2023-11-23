@@ -12,7 +12,6 @@ async def process_media(message: types.Message, task_info):
     :param task_info: Словарь данных пользователя для сохранения путей к файлам.
     :return: Обновленный task_info с путями к фото и документам.
     """
-    print('process media')
     if message.photo:
         highest_resolution_photo = message.photo[-1]
         photo_path = await save_file(highest_resolution_photo.file_id, message.from_user.id)
