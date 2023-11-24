@@ -3,7 +3,7 @@ from aiogram import types
 
 from aiogram.utils.callback_data import CallbackData
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, InputFile
-from dbtools import get_sheet_name_by_chat_id, insert_task, mark_task_id_file
+from dbtools import get_sheet_name_by_chat_id, get_sheet_url_by_chat_id, insert_task, mark_task_id_file
 from google_sheets.google_sheets_tools import add_row_to_sheet
 
 from task_markups import *
@@ -85,26 +85,27 @@ async def confirmed_task(query: CallbackQuery, user_data, **kwargs):
 
     task_info_data_to_db = {k: v for k, v in {**task_info_defaults, **task_info}.items() if k not in ['photo_paths', 'document_paths']}
     task_info_data = {k: v for k, v in {**task_info_defaults, **task_info}.items()}
-    try:
-        current_task_id = await insert_task(**task_info_data_to_db)
-        if "photo_paths" in task_info:
-            for photo_path in task_info["photo_paths"]:
-                await mark_task_id_file(task_id = current_task_id, file_path = photo_path)
+    # try:
+    current_task_id = await insert_task(**task_info_data_to_db)
+    if "photo_paths" in task_info:
+        for photo_path in task_info["photo_paths"]:
+            await mark_task_id_file(task_id = current_task_id, file_path = photo_path)
 
-        if "document_paths" in task_info:
-            for document_path in task_info["document_paths"]:
-                await mark_task_id_file(task_id = current_task_id, file_path = document_path)
-        # зАПИСЬ ЯЧЕЙКИ
-        
-        sheet_name = await get_sheet_name_by_chat_id(chat_id)
-        add_row_to_sheet(SHEET_URL, sheet_name, task_info_data)
+    if "document_paths" in task_info:
+        for document_path in task_info["document_paths"]:
+            await mark_task_id_file(task_id = current_task_id, file_path = document_path)
+    # зАПИСЬ ЯЧЕЙКИ
+    
+    sheet_name = await get_sheet_name_by_chat_id(chat_id)
+    sheet_url = await get_sheet_url_by_chat_id(chat_id)
+    add_row_to_sheet(sheet_url, sheet_name, task_info_data)
 
-        await query.message.edit_text(
-            text="Задача успешно добавлена",
-            reply_markup=keyboard_markup
-        )
-    except Exception as e:
-        await query.message.edit_text(
-            text=f"Ошибка добавления задачи: \n{e.message}",
-            reply_markup=keyboard_markup
-        )
+    await query.message.edit_text(
+        text="Задача успешно добавлена",
+        reply_markup=keyboard_markup
+    )
+    # except Exception as e:
+    #     await query.message.edit_text(
+    #         text=f"Ошибка добавления задачи: \n{e.message}",
+    #         reply_markup=keyboard_markup
+    #     )

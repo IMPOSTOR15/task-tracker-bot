@@ -5,7 +5,8 @@ from aiogram.utils.callback_data import CallbackData
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, InputFile, ParseMode
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from dbtools import insert_incedent
+from dbtools import get_sheet_name_by_chat_id, get_sheet_url_by_chat_id, insert_incedent
+from google_sheets.google_sheets_tools import add_incedent_row_to_sheet
 
 from incedent_markups import *
 from main import bot
@@ -95,7 +96,7 @@ async def description_incedent_input(message: types.Message, user_data, **kwargs
     if "last_bot_message_id" in user_data[message.from_user.id]:
         await bot.delete_message(chat_id=message.chat.id, message_id=user_data[message.from_user.id]["last_bot_message_id"])
         del user_data[message.from_user.id]["last_bot_message_id"]
-
+    
     print(incedent_info)
     confirmation_message = (
         "Пожалуйста, удостоверьтесь в правильности собранных данных:\n"
@@ -129,9 +130,13 @@ async def description_incedent_input_without_description(query: CallbackQuery, u
     )
 
 async def confirmed_incedent(query: CallbackQuery, user_data, **kwargs):
-
+    chat_id = query.message.chat.id
     # Добавить логику по добавлению инцедента в бд и отправки уведомления и гугл таблица тоже
     await insert_incedent(**incedent_info)
+    print(incedent_info)
+    sheet_name = await get_sheet_name_by_chat_id(chat_id)
+    sheet_url = await get_sheet_url_by_chat_id(chat_id)
+    add_incedent_row_to_sheet(sheet_url, sheet_name, incedent_info)
     keyboard_markup = await incedent_writed_kayboard()
     await query.message.edit_text(
         text="Инцедент успешно добавлен",

@@ -2,6 +2,7 @@
 from aiogram import types
 
 from aiogram.types import CallbackQuery
+from hellpers import clean_task_info
 
 from task_markups import *
 from tasks_handlers_categories.finance.markups_templates.finance_price_elasticity_markups import *
@@ -59,12 +60,14 @@ async def input_finance_price_elasticity_description_handler_without_date(query:
 #Получение описание задачи
 #Ожидание подтверждения
 async def input_finance_price_elasticity_description_handler(message: types.Message, user_data, **kwargs):
+    global task_info
     task_info["task_description"] = message.text
     await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
     if "last_bot_message_id" in user_data[message.from_user.id]:
         await bot.delete_message(chat_id=message.chat.id, message_id=user_data[message.from_user.id]["last_bot_message_id"])
         del user_data[message.from_user.id]["last_bot_message_id"]
 
+    task_info = clean_task_info(task_info)
     confirmation_message = (
         "Пожалуйста, удостоверьтесь в правильности собранных данных:\n"
         f"\n⚪️ Категория задачи: {task_info['task_category']}\n"
@@ -83,8 +86,8 @@ async def input_finance_price_elasticity_description_handler(message: types.Mess
 #Если описание не ввели
 #Ожидание подтверждения
 async def finance_price_elasticity_confirmation_handler_without_description(query: CallbackQuery, user_data, **kwargs):
-    task_info["task_description"] = "-"
-
+    global task_info
+    task_info = clean_task_info(task_info)
     confirmation_message = (
         "Пожалуйста, удостоверьтесь в правильности собранных данных:\n"
         f"\n⚪️ Категория задачи: {task_info['task_category']}\n"

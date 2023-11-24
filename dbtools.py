@@ -98,7 +98,21 @@ async def get_sheet_name_by_chat_id(chat_id: int):
             return row['sheet_name']
         else:
             return None
-
+        
+async def get_sheet_url_by_chat_id(chat_id: int):
+    async with PoolConnection() as conn:
+        row = await conn.fetchrow(
+            """
+            SELECT table_link FROM chats
+            WHERE chat_id = $1
+            """,
+            chat_id
+        )
+        if row:
+            return row['table_link']
+        else:
+            return None
+        
 async def insert_task(
         task_category: str = "-",
         task_subcategory: str = "-",

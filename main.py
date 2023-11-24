@@ -643,7 +643,6 @@ async def process_confirm_task(query: CallbackQuery, callback_data: dict, **kwar
 
 
 async def main():
-    # asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
     await create_pool()
     await init_db()
     await dp.start_polling()

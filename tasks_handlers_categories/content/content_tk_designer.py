@@ -2,6 +2,7 @@
 from aiogram import types
 
 from aiogram.types import CallbackQuery
+from hellpers import clean_task_info
 
 from task_markups import *
 from tasks_handlers_categories.content.markups_templates.content_tk_designer_markups import *
@@ -87,6 +88,7 @@ async def input_content_tk_designer_description_handler_without_date(query: Call
 #Получение описание задачи
 #Ожидание подтверждения
 async def input_content_tk_designer_description_handler(message: types.Message, user_data, **kwargs):
+    global task_info
     default_value = "-"
 
     task_category = task_info.get('task_category', default_value)
@@ -99,12 +101,16 @@ async def input_content_tk_designer_description_handler(message: types.Message, 
         await bot.delete_message(chat_id=message.chat.id, message_id=user_data[message.from_user.id]["last_bot_message_id"])
         del user_data[message.from_user.id]["last_bot_message_id"]
 
+    task_info = clean_task_info(task_info)
     confirmation_message = (
         "Пожалуйста, удостоверьтесь в правильности собранных данных:\n"
         f"\n⚪️ Категория задачи: {task_category}\n"
         f"\n⚪️ Подкатегория задачи: {task_subcategory}\n"
         f"\n⚪️ Данные о товарах: {goods_info}\n"
+        f"\n⚪️ Фото товаров: {task_info['photo_paths']}\n"
+        f"\n⚪️ Документы: {task_info['document_paths']}\n"
         f"\n⚪️ Описание задачи: {task_description}"
+        
     )
 
     keyboard_markup = await task_confirm_keyboard()
@@ -117,18 +123,22 @@ async def input_content_tk_designer_description_handler(message: types.Message, 
 #Если описание не ввели
 #Ожидание подтверждения
 async def content_tk_designer_confirmation_handler_without_description(query: CallbackQuery, user_data, **kwargs):
+    global task_info
     default_value = "-"
 
     task_category = task_info.get('task_category', default_value)
     task_subcategory = task_info.get('task_subcategory', default_value)
     goods_info = task_info.get('goods_info', default_value)
     task_description = task_info.get('task_description', default_value)
-
+    
+    task_info = clean_task_info(task_info)
     confirmation_message = (
         "Пожалуйста, удостоверьтесь в правильности собранных данных:\n"
         f"\n⚪️ Категория задачи: {task_category}\n"
         f"\n⚪️ Подкатегория задачи: {task_subcategory}\n"
         f"\n⚪️ Данные о товарах: {goods_info}\n"
+        f"\n⚪️ Фото товаров: {task_info['photo_paths']}\n"
+        f"\n⚪️ Документы: {task_info['document_paths']}\n"
         f"\n⚪️ Описание задачи: {task_description}"
     )
 

@@ -2,6 +2,7 @@
 from aiogram import types
 
 from aiogram.types import CallbackQuery
+from hellpers import clean_task_info
 from save_tools import process_media
 
 from task_markups import *
@@ -127,12 +128,14 @@ async def input_text_content_refresh_description_handler_without_data(query: Cal
 #Получение описание задачи
 #Ожидание подтверждения
 async def input_text_content_refresh_confirmation_handler(message: types.Message, user_data, **kwargs):
+    global task_info
     task_info["task_description"] = message.text
     await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
     if "last_bot_message_id" in user_data[message.from_user.id]:
         await bot.delete_message(chat_id=message.chat.id, message_id=user_data[message.from_user.id]["last_bot_message_id"])
         del user_data[message.from_user.id]["last_bot_message_id"]
-
+        
+    task_info = clean_task_info(task_info)
     confirmation_message = (
         "Пожалуйста, удостоверьтесь в правильности собранных данных:\n"
         f"\n⚪️ Категория задачи: {task_info['task_category']}\n"
@@ -153,8 +156,10 @@ async def input_text_content_refresh_confirmation_handler(message: types.Message
 #Если описание не ввели
 #Ожидание подтверждения
 async def text_content_refresh_confirmation_handler_without_description(query: CallbackQuery, user_data, **kwargs):
-    task_info["task_description"] = "-"
+    
 
+    global task_info
+    task_info = clean_task_info(task_info)
     confirmation_message = (
         "Пожалуйста, удостоверьтесь в правильности собранных данных:\n"
         f"\n⚪️ Категория задачи: {task_info['task_category']}\n"
