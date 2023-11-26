@@ -15,7 +15,7 @@ async def analysis_abc_xyz_period_date_handler(query: CallbackQuery, user_data, 
         "current_message": "analysis_abc_xyz_date",
         "last_bot_message_id": query.message.message_id
     }
-    keyboard_markup = await analysis_abc_xyz_date_keyboard(user_data["prev_action"])
+    keyboard_markup = await analysis_abc_xyz_date_keyboard("task_analitic")
     user_data["prev_action"] = "analysis_abc_xyz"
 
     await query.message.edit_text(text="Выберите дату начала периода анализа и Выберите дату конца периода анализа.\n Пример: 09.09.2023 - 18.09.2023", reply_markup=keyboard_markup)
@@ -33,7 +33,7 @@ async def input_analysis_abc_xyz_period_date_handler(message: types.Message, use
     keyboard_markup = await analysis_abc_xyz_description_keyboard(user_data["prev_action"])
     sent_message = await bot.send_message(
         chat_id=message.chat.id,
-        text="Даты периода записаны.\nОпишите задачу подробнее, если это требуется",
+        text="Даты периода записаны.\nОпишите задачу подробнее, если это требуется\n\n⚠Не забудьте отправить текст прежде чем перейти к следующему шагу⚠\n\nИначе необходимое текстовое сопровождение не добавиться к задачи.",
         reply_markup=keyboard_markup
     )
     user_data[message.from_user.id] = {
@@ -52,7 +52,7 @@ async def input_analysis_abc_xyz_description_handler_without_date(query: Callbac
 
     keyboard_markup = await analysis_abc_xyz_description_keyboard(user_data["prev_action"])
     await query.message.edit_text(
-        text="Вы пропустили добавление дат периода.\nОпишите задачу подробнее, если это требуется",
+        text="Вы пропустили добавление дат периода.\nОпишите задачу подробнее, если это требуется\n\n⚠Не забудьте отправить текст прежде чем перейти к следующему шагу⚠\n\nИначе необходимое текстовое сопровождение не добавиться к задачи.",
         reply_markup=keyboard_markup
     )
 

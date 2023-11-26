@@ -19,7 +19,7 @@ async def content_upload_image_action_handler(query: CallbackQuery, user_data, *
         "current_message": "content_upload_image_date",
         "last_bot_message_id": query.message.message_id
     }
-    keyboard_markup = await content_upload_image_task_type_keyboard(user_data["prev_action"])
+    keyboard_markup = await content_upload_image_task_type_keyboard("task_content")
     user_data["prev_action"] = "new_image_content"
     
     await query.message.edit_text(text="Выберите действие",
@@ -41,9 +41,9 @@ async def input_content_upload_image_task_type_handler(query: CallbackQuery, use
         "last_bot_message_id": query.message.message_id
     }
     
-    keyboard_markup = await content_upload_image_description_keyboard(user_data["prev_action"])
+    keyboard_markup = await content_upload_image_goods_info_keyboard(user_data["prev_action"])
     await query.message.edit_text(
-        text="Отправьте новое фото или прекрепите ссылку на файловое хранилище (удостоверьтесь что доступ к фото открыт)",
+        text="Отправьте новое фото или прекрепите ссылку на файловое хранилище (удостоверьтесь что доступ к фото открыт)\n\n⚠Не забудьте отправить текст прежде чем перейти к следующему шагу⚠\n\nИначе необходимое текстовое сопровождение не добавиться к задачи.\n\n⚠Отправляйте не более 10 файлов за раз⚠",
         reply_markup=keyboard_markup
     )
 
@@ -71,7 +71,7 @@ async def input_content_upload_image_date_handler(message: types.Message, user_d
         keyboard_markup = await content_upload_image_goods_info_keyboard(user_data["prev_action"])
         sent_message = await bot.send_message(
             chat_id=message.chat.id,
-            text="Данные записаны.\nДобавьте другие файлы и/или информацию при необходимости",
+            text="Данные записаны.\nДобавьте другие файлы и/или информацию при необходимости \n\n⚠Отправляйте не более 10 файлов за раз⚠",
             reply_markup=keyboard_markup
         )
         user_data[message.from_user.id] = {
@@ -91,9 +91,9 @@ async def input_content_upload_image_description_handler_without_data(query: Cal
         "last_bot_message_id": query.message.message_id
     }
     
-    keyboard_markup = await content_upload_image_description_keyboard(user_data["prev_action"])
+    keyboard_markup = await content_upload_image_description_keyboard('new_image_content')
     await query.message.edit_text(
-        text="Опишите задачу подробнее, если это требуется",
+        text="Опишите задачу подробнее, если это требуется\n\n⚠Не забудьте отправить текст прежде чем перейти к следующему шагу⚠\n\nИначе необходимое текстовое сопровождение не добавиться к задачи.",
         reply_markup=keyboard_markup
     )
 

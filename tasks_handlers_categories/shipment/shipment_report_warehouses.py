@@ -16,8 +16,8 @@ async def shipment_report_warehouses_date_handler(query: CallbackQuery, user_dat
         "current_message": "shipment_report_warehouses_date",
         "last_bot_message_id": query.message.message_id
     }
-    keyboard_markup = await shipment_report_warehouses_date_keyboard(user_data["prev_action"])
-    user_data["prev_action"] = "report_section_financial"
+    keyboard_markup = await shipment_report_warehouses_date_keyboard("task_delivery")
+    user_data["prev_action"] = "report_warehouses_shipment"
 
     await query.message.edit_text(text="Выберите дату начала периода отчета и Выберите дату конца периода отчета.\n Пример: 09.09.2023 - 18.09.2023", reply_markup=keyboard_markup)
     await query.answer()
@@ -34,7 +34,7 @@ async def input_shipment_report_warehouses_date_handler(message: types.Message, 
     keyboard_markup = await shipment_report_warehouses_description_keyboard(user_data["prev_action"])
     sent_message = await bot.send_message(
         chat_id=message.chat.id,
-        text="Даты периода записаны.\nОпишите задачу подробнее, если это требуется",
+        text="Даты периода записаны.\nОпишите задачу подробнее, если это требуется\n\n⚠Не забудьте отправить текст прежде чем перейти к следующему шагу⚠\n\nИначе необходимое текстовое сопровождение не добавиться к задачи.",
         reply_markup=keyboard_markup
     )
     user_data[message.from_user.id] = {
@@ -53,7 +53,7 @@ async def input_shipment_report_warehouses_description_handler_without_date(quer
 
     keyboard_markup = await shipment_report_warehouses_description_keyboard(user_data["prev_action"])
     await query.message.edit_text(
-        text="Вы пропустили добавление даты периода.\nОпишите задачу подробнее, если это требуется",
+        text="Вы пропустили добавление даты периода.\nОпишите задачу подробнее, если это требуется\n\n⚠Не забудьте отправить текст прежде чем перейти к следующему шагу⚠\n\nИначе необходимое текстовое сопровождение не добавиться к задачи.",
         reply_markup=keyboard_markup
     )
 

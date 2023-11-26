@@ -39,52 +39,53 @@ async def incedent_type_handler(query: CallbackQuery, user_data, **kwargs):
     await query.message.edit_text(text=f"{incedent_type_text}Выберите тип инцедента. По чьей вине произошел инцедент?", reply_markup=keyboard_markup)
     await query.answer()
 
-async def seller_error_incedent_handler(query: CallbackQuery, user_data, **kwargs):
-    incedent_info['type'] = "Ошибка селлера"
-    user_data["prev_action"] = "seller_error"
-    keyboard_markup = await incedent_work_keyboard("incedent")
-    await query.message.edit_text(text=f"{incedent_works_text}Выберите вид работ для инцедента", reply_markup=keyboard_markup)
-    await query.answer()
+async def seller_error_incedent_handler(query: CallbackQuery, user_data, action, **kwargs):
+    if (action == "seller_error"):
+        incedent_info['type'] = "Ошибка селлера"
+        user_data["prev_action"] = "seller_error"
+    if (action == "manager_error"):
+        incedent_info['type'] = "Ошибка менеджера"
+        user_data["prev_action"] = "manager_error"
+    if (action == "marketplace_error"):
+        incedent_info['type'] = "Ошибка маркетплейса"
+        user_data["prev_action"] = "marketplace_error"
 
-
-async def manager_error_incedent_handler(query: CallbackQuery, user_data, **kwargs):
-    incedent_info['type'] = "Ошибка менеджера"
-    user_data["prev_action"] = "manager_error"
-    keyboard_markup = await incedent_work_keyboard("incedent")
-    await query.message.edit_text(text=f"{incedent_works_text}Выберите вид работ для инцедента", reply_markup=keyboard_markup)
-    await query.answer()
-
-async def marketplace_error_incedent_handler(query: CallbackQuery, user_data, **kwargs):
-    incedent_info['type'] = "Ошибка маркетплейса"
-    user_data["prev_action"] = "marketplace_error"
+    user_data['current_error_state'] = user_data["prev_action"]
     keyboard_markup = await incedent_work_keyboard("incedent")
     await query.message.edit_text(text=f"{incedent_works_text}Выберите вид работ для инцедента", reply_markup=keyboard_markup)
     await query.answer()
 
 async def shipment_incedent_handler(query: CallbackQuery, user_data, **kwargs):
     incedent_info['work_category'] = "Поставки"
-    keyboard_markup = await incedent_shipment_keyboard(user_data["prev_action"])
+    print(user_data["prev_action"])
+
+    keyboard_markup = await incedent_shipment_keyboard(user_data['current_error_state'])
     user_data["prev_action"] = "incedent_shipment"
     await query.message.edit_text(text="Выберите вид работ для инцедента c поставкой", reply_markup=keyboard_markup)
     await query.answer()
 
 async def content_incedent_handler(query: CallbackQuery, user_data, **kwargs):
     incedent_info['work_category'] = "Контент"
-    keyboard_markup = await incedent_content_keyboard(user_data["prev_action"])
+    keyboard_markup = await incedent_content_keyboard(user_data['current_error_state'])
     user_data["prev_action"] = "incedent_content"
     await query.message.edit_text(text="Выберите вид работ для инцедента с контентом", reply_markup=keyboard_markup)
     await query.answer()
 
-async def description_incedent_handler(query: CallbackQuery, user_data, **kwargs):
+async def description_incedent_handler(query: CallbackQuery, user_data, action, **kwargs):
     user_data[query.from_user.id] = {
         "current_message": "description_incedent",
         "last_bot_message_id": query.message.message_id  # Сохраняем message_id последнего сообщения бота
     }
 
     keyboard_markup = await incedent_description_keyboard(user_data["prev_action"])
-    user_data["prev_action"] = "description_incedent"
-    user_data["current_message"] = "description_incedent"
-    await query.message.edit_text(text="Опишите инцедент подробнее, если это требуется", reply_markup=keyboard_markup)
+    if (action == "incedent_content_infographic" or action == "incedent_content_text" or action == "incedent_content_data"):
+        user_data["prev_action"] = 'incedent_content'
+        msg_text = "Опишите инцедент подробнее, если это требуется. Также прикрепите sku или ссылку на карточку товара\n\n⚠Не забудьте отправить текст прежде чем перейти к следующему шагу⚠\n\nИначе необходимое текстовое сопровождение не добавиться к задачи."
+    if (action == "incedent_shipment_remains" or action == "incedent_shipment_documents" or action == "incedent_shipment_driver"):
+        user_data["prev_action"] = 'incedent_shipment'
+        msg_text = "Опишите инцедент подробнее, если это требуется\n\n⚠Не забудьте отправить текст прежде чем перейти к следующему шагу⚠\n\nИначе необходимое текстовое сопровождение не добавиться к задачи."
+
+    await query.message.edit_text(text=msg_text, reply_markup=keyboard_markup)
     await query.answer()
 
 

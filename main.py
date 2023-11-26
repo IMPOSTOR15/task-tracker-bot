@@ -36,7 +36,7 @@ from tasks_handlers_categories.finance.financial_performance_report import *
 from tasks_handlers_categories.shipment.shipment_turnover_report import *
 from tasks_handlers_categories.shipment.shipment_report_warehouses import *
 from tasks_handlers_categories.shipment.shipment_create_delivery import *
-#Добавить здесь импорты создания поставки
+from tasks_handlers_categories.shipment.shipment_calculation_delivery import *
 from tasks_handlers_categories.shipment.shipment_acceptance_control import *
 # Импорты контента
 from tasks_handlers_categories.content.content_card_analysis import *
@@ -113,20 +113,14 @@ async def cmd_register_link(message: types.Message):
 async def process_incedent_type_handler(query: CallbackQuery, callback_data: dict, **kwargs):
     await incedent_type_handler(query, user_data, **kwargs)
 
-@dp.callback_query_handler(incedent_cd.filter(action="seller_error"))
+@dp.callback_query_handler(incedent_cd.filter(action=["seller_error", "manager_error", "marketplace_error"]))
 async def process_seller_error_incedent_handler(query: CallbackQuery, callback_data: dict, **kwargs):
-    await seller_error_incedent_handler(query, user_data, **kwargs)
-
-@dp.callback_query_handler(incedent_cd.filter(action="manager_error"))
-async def process_manager_error_incedent_handler(query: CallbackQuery, callback_data: dict, **kwargs):
-    await manager_error_incedent_handler(query, user_data, **kwargs)
-
-@dp.callback_query_handler(incedent_cd.filter(action="marketplace_error"))
-async def process_marketplace_error_incedent_handler(query: CallbackQuery, callback_data: dict, **kwargs):
-    await marketplace_error_incedent_handler(query, user_data, **kwargs)
+    action = callback_data.get('action')
+    await seller_error_incedent_handler(query, user_data, action, **kwargs)
 
 @dp.callback_query_handler(incedent_cd.filter(action="incedent_shipment"))
 async def process_shipment_incedent_handler(query: CallbackQuery, callback_data: dict, **kwargs):
+    
     await shipment_incedent_handler(query, user_data, **kwargs)
 
 @dp.callback_query_handler(incedent_cd.filter(action="incedent_content"))
@@ -135,7 +129,8 @@ async def process_content_incedent_handler(query: CallbackQuery, callback_data: 
 
 @dp.callback_query_handler(incedent_cd.filter(action=["incedent_content_infographic", "incedent_content_text", "incedent_content_data", "incedent_shipment_remains", "incedent_shipment_documents", "incedent_shipment_driver"]))
 async def process_description_incedent_handler(query: CallbackQuery, callback_data: dict, **kwargs):
-    await description_incedent_handler(query, user_data, **kwargs)
+    action = callback_data.get('action')
+    await description_incedent_handler(query, user_data, action, **kwargs)
 
 @dp.message_handler(lambda message: message.from_user.id in user_data and user_data[message.from_user.id].get("current_message") == "description_incedent")
 async def process_description_incedent_input(message: types.Message, **kwargs):
@@ -414,13 +409,34 @@ async def process_shipment_report_warehouses_confirmation_handler_without_descri
 
 #Расчет поставки на склад
 @dp.callback_query_handler(task_cd.filter(action="calculation_delivery_shipment"))
-async def process_shipment_create_delivery_warehouse_handler(query: CallbackQuery, callback_data: dict, **kwargs):
-    await shipment_create_delivery_warehouse_handler(query, user_data, **kwargs)
+async def process_shipment_calculation_delivery_warehouse_handler(query: CallbackQuery, callback_data: dict, **kwargs):
+    await shipment_calculation_delivery_warehouse_handler(query, user_data, **kwargs)
 
-@dp.callback_query_handler(task_cd.filter(action=["task_shipment_create_delivery_continue_center", "task_shipment_create_delivery_continue_region", "task_shipment_create_delivery_continue_all"]))
-async def process_input_shipment_create_delivery_warehouse_handler(query: CallbackQuery, callback_data: dict, **kwargs):
+@dp.callback_query_handler(task_cd.filter(action=["task_shipment_calculation_delivery_continue_center", "task_shipment_calculation_delivery_continue_region", "task_shipment_calculation_delivery_continue_all"]))
+async def process_input_shipment_calculation_delivery_warehouse_handler(query: CallbackQuery, callback_data: dict, **kwargs):
     action = callback_data.get('action')
-    await input_shipment_create_delivery_warehouse_handler(query, user_data, action, **kwargs)
+    await input_shipment_calculation_delivery_warehouse_handler(query, user_data, action, **kwargs)
+
+@dp.message_handler(lambda message: message.from_user.id in user_data and user_data[message.from_user.id].get("current_message") == "shipment_calculation_delivery_description")
+async def process_input_shipment_calculation_delivery_description_handler(message: types.Message, **kwargs):
+    await input_shipment_calculation_delivery_description_handler(message, user_data, **kwargs)
+
+@dp.callback_query_handler(task_cd.filter(action="task_shipment_calculation_delivery_continue_no_description"))
+async def process_shipment_calculation_delivery_confirmation_handler_without_description(query: CallbackQuery, callback_data: dict, **kwargs):
+    await shipment_calculation_delivery_confirmation_handler_without_description(query, user_data, **kwargs)
+
+
+#Создать поставку
+
+
+@dp.callback_query_handler(task_cd.filter(action="create_delivery_shipment"))
+async def process_shipment_create_delivery_date_handler(query: CallbackQuery, callback_data: dict, **kwargs):
+    await shipment_create_delivery_handler(query, user_data, **kwargs)
+
+@dp.callback_query_handler(task_cd.filter(action=["task_shipment_create_prev_data", "task_shipment_create_contact"]))
+async def process_input_shipment_create_delivery_date_handler(query: CallbackQuery, callback_data: dict, **kwargs):
+    action = callback_data.get('action')
+    await input_shipment_create_delivery_type_handler(query, user_data, action, **kwargs)
 
 @dp.message_handler(lambda message: message.from_user.id in user_data and user_data[message.from_user.id].get("current_message") == "shipment_create_delivery_description")
 async def process_input_shipment_create_delivery_description_handler(message: types.Message, **kwargs):
@@ -429,15 +445,6 @@ async def process_input_shipment_create_delivery_description_handler(message: ty
 @dp.callback_query_handler(task_cd.filter(action="task_shipment_create_delivery_continue_no_description"))
 async def process_shipment_create_delivery_confirmation_handler_without_description(query: CallbackQuery, callback_data: dict, **kwargs):
     await shipment_create_delivery_confirmation_handler_without_description(query, user_data, **kwargs)
-
-
-#Создать поставку
-
-
-
-
-
-
 
 
 
@@ -641,13 +648,10 @@ async def process_text_content_refresh_confirmation_handler_without_description(
 async def process_confirm_task(query: CallbackQuery, callback_data: dict, **kwargs):
     await confirmed_task(query, user_data, **kwargs)
 
-
 async def main():
     await create_pool()
     await init_db()
     await dp.start_polling()
-    
-
 
 if __name__ == '__main__':
     asyncio.run(main())

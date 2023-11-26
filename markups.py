@@ -6,7 +6,7 @@ menu_cd = CallbackData("menu", "action")
 
 async def main_task_keyboard():
     keyboard = InlineKeyboardMarkup()
-    incedent_btn = InlineKeyboardButton("Инцедент", callback_data=menu_cd.new(action="incedent"))
+    incedent_btn = InlineKeyboardButton("Инцидент", callback_data=menu_cd.new(action="incedent"))
     task_btn = InlineKeyboardButton("Задача", callback_data=menu_cd.new(action="task"))
     keyboard.add(incedent_btn)
     keyboard.add(task_btn)

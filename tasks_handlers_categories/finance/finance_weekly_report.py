@@ -16,7 +16,7 @@ async def finance_weekly_report_date_handler(query: CallbackQuery, user_data, **
         "current_message": "finance_weekly_report_week",
         "last_bot_message_id": query.message.message_id
     }
-    keyboard_markup = await finance_weekly_report_week_keyboard(user_data["prev_action"])
+    keyboard_markup = await finance_weekly_report_week_keyboard("task_finance")
     user_data["prev_action"] = "weekly_report_financial"
 
     await query.message.edit_text(text="Выберите неделю (номер) и год, за который хотите получить отчет.\n Пример: '43 неделя 2023 год' (30.10.23 - 05.11.23)", reply_markup=keyboard_markup)
@@ -34,7 +34,7 @@ async def input_finance_weekly_report_week_handler(message: types.Message, user_
     keyboard_markup = await finance_weekly_report_description_keyboard(user_data["prev_action"])
     sent_message = await bot.send_message(
         chat_id=message.chat.id,
-        text="Неделя записана.\nОпишите задачу подробнее, если это требуется",
+        text="Неделя записана.\nОпишите задачу подробнее, если это требуется\n\n⚠Не забудьте отправить текст прежде чем перейти к следующему шагу⚠\n\nИначе необходимое текстовое сопровождение не добавиться к задачи.",
         reply_markup=keyboard_markup
     )
     user_data[message.from_user.id] = {
@@ -53,7 +53,7 @@ async def input_finance_weekly_report_description_handler_without_week(query: Ca
 
     keyboard_markup = await finance_weekly_report_description_keyboard(user_data["prev_action"])
     await query.message.edit_text(
-        text="Вы пропустили добавление недели.\nОпишите задачу подробнее, если это требуется",
+        text="Вы пропустили добавление недели.\nОпишите задачу подробнее, если это требуется\n\n⚠Не забудьте отправить текст прежде чем перейти к следующему шагу⚠\n\nИначе необходимое текстовое сопровождение не добавиться к задачи.",
         reply_markup=keyboard_markup
     )
 

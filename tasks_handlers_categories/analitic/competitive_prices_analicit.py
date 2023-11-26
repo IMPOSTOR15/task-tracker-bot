@@ -16,7 +16,7 @@ async def competitors_prices_links_handler(query: CallbackQuery, user_data, **kw
         "current_message": "competitors_prices_links",
         "last_bot_message_id": query.message.message_id
     }
-    keyboard_markup = await competitors_prices_links_keyboard(user_data["prev_action"])
+    keyboard_markup = await competitors_prices_links_keyboard("task_analitic")
     user_data["prev_action"] = "competitor_analysis"
 
     await query.message.edit_text(text="Перечислите ссылки на товары конкурентов через запятую", reply_markup=keyboard_markup)
@@ -34,7 +34,7 @@ async def input_competitors_prices_links_handler(message: types.Message, user_da
     keyboard_markup = await competitors_prices_description_keyboard(user_data["prev_action"])
     sent_message = await bot.send_message(
         chat_id=message.chat.id,
-        text="Ссылки на товары конкурентов записаны.\nОпишите задачу подробнее, если это требуется",
+        text="Ссылки на товары конкурентов записаны.\nОпишите задачу подробнее, если это требуется\n\n⚠Не забудьте отправить текст прежде чем перейти к следующему шагу⚠\n\nИначе необходимое текстовое сопровождение не добавиться к задачи.",
         reply_markup=keyboard_markup
     )
     user_data[message.from_user.id] = {
@@ -52,7 +52,7 @@ async def input_competitors_prices_description_handler_without_links(query: Call
 
     keyboard_markup = await competitors_prices_description_keyboard(user_data["prev_action"])
     await query.message.edit_text(
-        text="Вы пропустили добавление ссылок на товары конкурентов.\nОпишите задачу подробнее, если это требуется",
+        text="Вы пропустили добавление ссылок на товары конкурентов.\nОпишите задачу подробнее, если это требуется\n\n⚠Не забудьте отправить текст прежде чем перейти к следующему шагу⚠\n\nИначе необходимое текстовое сопровождение не добавиться к задачи.",
         reply_markup=keyboard_markup
     )
 #Получение описание задачи

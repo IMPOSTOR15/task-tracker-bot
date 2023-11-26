@@ -2,14 +2,12 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from markups import back_button
 from task_markups import task_cd
 
-async def shipment_create_delivery_date_keyboard(back_action):
+async def shipment_create_delivery_data_keyboard(back_action):
     keyboard = InlineKeyboardMarkup()
-    center_warehouse_btn = InlineKeyboardButton("Центральный", callback_data=task_cd.new(action="task_shipment_create_delivery_continue_center"))
-    region_warehouse_btn = InlineKeyboardButton("Региональный", callback_data=task_cd.new(action="task_shipment_create_delivery_continue_region"))
-    all_warehouse_btn = InlineKeyboardButton("Все", callback_data=task_cd.new(action="task_shipment_create_delivery_continue_all"))
-    keyboard.add(center_warehouse_btn)
-    keyboard.add(region_warehouse_btn)
-    keyboard.add(all_warehouse_btn)
+    confirm_data_btn = InlineKeyboardButton("Подтверждение ранее согласованных данных", callback_data=task_cd.new(action="task_shipment_create_prev_data"))
+    contact_btn = InlineKeyboardButton("Требует согласования", callback_data=task_cd.new(action="task_shipment_create_contact"))
+    keyboard.add(confirm_data_btn)
+    keyboard.add(contact_btn)
     keyboard.add(back_button(task_cd, back_action))
     return keyboard
 

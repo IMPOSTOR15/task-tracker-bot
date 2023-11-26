@@ -17,7 +17,7 @@ async def content_card_analysis_skus_handler(query: CallbackQuery, user_data, **
         "last_bot_message_id": query.message.message_id
     }
 
-    keyboard_markup = await content_card_analysis_goods_ids_keyboard(user_data["prev_action"])
+    keyboard_markup = await content_card_analysis_goods_ids_keyboard("task_content")
     user_data["prev_action"] = "card_analysis_content"
     await query.answer()
     await query.message.edit_text(
@@ -38,7 +38,7 @@ async def input_content_card_analysis_description_handler(message: types.Message
     keyboard_markup = await content_card_analysis_description_keyboard(user_data["prev_action"])
     sent_message = await bot.send_message(
         chat_id=message.chat.id,
-        text="Артикулы маркетплейса записаны.\nОпишите задачу подробнее, если это требуется",
+        text="Артикулы маркетплейса записаны.\nОпишите задачу подробнее, если это требуется\n\n⚠Не забудьте отправить текст прежде чем перейти к следующему шагу⚠\n\nИначе необходимое текстовое сопровождение не добавиться к задачи.",
         reply_markup=keyboard_markup
     )
     user_data[message.from_user.id] = {
@@ -56,7 +56,7 @@ async def input_content_card_analysis_description_handler_all_goods_ids(query: C
 
     keyboard_markup = await content_card_analysis_description_keyboard(user_data["prev_action"])
     await query.message.edit_text(
-        text="В отчёт войду все товары.\nОпишите задачу подробнее, если это требуется",
+        text="В отчёт войду все товары.\nОпишите задачу подробнее, если это требуется\n\n⚠Не забудьте отправить текст прежде чем перейти к следующему шагу⚠\n\nИначе необходимое текстовое сопровождение не добавиться к задачи.",
         reply_markup=keyboard_markup
     )
 
@@ -71,7 +71,7 @@ async def input_content_card_analysis_description_handler_without_goods_ids(quer
 
     keyboard_markup = await content_card_analysis_description_keyboard(user_data["prev_action"])
     await query.message.edit_text(
-        text="Вы пропустили добавление артикулов маркетплейса.\nОпишите задачу подробнее, если это требуется",
+        text="Вы пропустили добавление артикулов маркетплейса.\nОпишите задачу подробнее, если это требуется\n\n⚠Не забудьте отправить текст прежде чем перейти к следующему шагу⚠\n\nИначе необходимое текстовое сопровождение не добавиться к задачи.",
         reply_markup=keyboard_markup
     )
 

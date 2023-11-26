@@ -68,9 +68,9 @@ async def input_text_content_refresh_task_type_handler(query: CallbackQuery, use
         "last_bot_message_id": query.message.message_id
     }
     
-    keyboard_markup = await text_content_refresh_description_keyboard(user_data["prev_action"])
+    keyboard_markup = await text_content_refresh_description_keyboard("task_refresh_content")
     await query.message.edit_text(
-        text="Отправьте новое фото или прекрепите ссылку на файловое хранилище (удостоверьтесь что доступ к фото открыт)",
+        text="Отправьте новое фото/текст/документ или прекрепите ссылку на файловое хранилище (удостоверьтесь что доступ к фото открыт)\n\n⚠Не забудьте отправить текст прежде чем перейти к следующему шагу⚠\n\nИначе необходимое текстовое сопровождение не добавиться к задачи.\n\n⚠Отправляйте не более 10 файлов за раз⚠",
         reply_markup=keyboard_markup
     )
 
@@ -95,10 +95,10 @@ async def input_text_content_refresh_file_handler(message: types.Message, user_d
             await bot.delete_message(chat_id=message.chat.id, message_id=user_data[message.from_user.id]["last_bot_message_id"])
             del user_data[message.from_user.id]["last_bot_message_id"]
     
-        keyboard_markup = await text_content_refresh_goods_info_keyboard(user_data["prev_action"])
+        keyboard_markup = await text_content_refresh_goods_info_keyboard("task_refresh_content")
         sent_message = await bot.send_message(
             chat_id=message.chat.id,
-            text="Данные записаны.\nДобавьте другие файлы и/или информацию при необходимости",
+            text="Данные записаны.\nДобавьте другие файлы и/или информацию при необходимости\n\n⚠Не забудьте отправить текст прежде чем перейти к следующему шагу⚠\n\nИначе необходимое текстовое сопровождение не добавиться к задачи.\n\n⚠Отправляйте не более 10 файлов за раз⚠",
             reply_markup=keyboard_markup
         )
         user_data[message.from_user.id] = {
@@ -119,9 +119,9 @@ async def input_text_content_refresh_description_handler_without_data(query: Cal
         "last_bot_message_id": query.message.message_id
     }
     
-    keyboard_markup = await text_content_refresh_description_keyboard(user_data["prev_action"])
+    keyboard_markup = await text_content_refresh_description_keyboard("task_refresh_content")
     await query.message.edit_text(
-        text="Опишите задачу подробнее, если это требуется",
+        text="Опишите задачу подробнее, если это требуется\n\n⚠Не забудьте отправить текст прежде чем перейти к следующему шагу⚠\n\nИначе необходимое текстовое сопровождение не добавиться к задачи.",
         reply_markup=keyboard_markup
     )
 

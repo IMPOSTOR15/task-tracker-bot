@@ -17,7 +17,7 @@ async def content_collect_seo_skus_handler(query: CallbackQuery, user_data, **kw
         "last_bot_message_id": query.message.message_id
     }
 
-    keyboard_markup = await content_collect_seo_goods_ids_keyboard(user_data["prev_action"])
+    keyboard_markup = await content_collect_seo_goods_ids_keyboard("task_content")
     user_data["prev_action"] = "collect_seo_content"
     await query.answer()
     await query.message.edit_text(
@@ -38,7 +38,7 @@ async def input_content_collect_seo_description_handler(message: types.Message, 
     keyboard_markup = await content_collect_seo_description_keyboard(user_data["prev_action"])
     sent_message = await bot.send_message(
         chat_id=message.chat.id,
-        text="Артикулы маркетплейса записаны.\nОпишите задачу подробнее, если это требуется",
+        text="Артикулы маркетплейса записаны.\nОпишите задачу подробнее, если это требуется\n\n⚠Не забудьте отправить текст прежде чем перейти к следующему шагу⚠\n\nИначе необходимое текстовое сопровождение не добавиться к задачи.",
         reply_markup=keyboard_markup
     )
     user_data[message.from_user.id] = {
@@ -57,7 +57,7 @@ async def input_content_collect_seo_description_handler_without_goods_ids(query:
 
     keyboard_markup = await content_collect_seo_description_keyboard(user_data["prev_action"])
     await query.message.edit_text(
-        text="Вы пропустили добавление артикулов маркетплейса.\nОпишите задачу подробнее, если это требуется",
+        text="Вы пропустили добавление артикулов маркетплейса.\nОпишите задачу подробнее, если это требуется\n\n⚠Не забудьте отправить текст прежде чем перейти к следующему шагу⚠\n\nИначе необходимое текстовое сопровождение не добавиться к задачи.",
         reply_markup=keyboard_markup
     )
 

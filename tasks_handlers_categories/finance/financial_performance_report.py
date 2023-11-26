@@ -19,7 +19,7 @@ async def financial_performance_report_date_handler(query: CallbackQuery, user_d
         "current_message": "financial_performance_report_date",
         "last_bot_message_id": query.message.message_id
     }
-    keyboard_markup = await financial_performance_report_date_keyboard(user_data["prev_action"])
+    keyboard_markup = await financial_performance_report_date_keyboard("task_finance")
     user_data["prev_action"] = "report_section_financial"
 
     await query.message.edit_text(text=f"{report_description_text}\nВыберите дату начала периода отчета и Выберите дату конца периода отчета.\n Пример: 09.09.2023 - 18.09.2023", reply_markup=keyboard_markup)
@@ -37,7 +37,7 @@ async def input_financial_performance_report_date_handler(message: types.Message
     keyboard_markup = await financial_performance_report_description_keyboard(user_data["prev_action"])
     sent_message = await bot.send_message(
         chat_id=message.chat.id,
-        text="Даты периода записаны.\nОпишите задачу подробнее, если это требуется",
+        text="Даты периода записаны.\nОпишите задачу подробнее, если это требуется\n\n⚠Не забудьте отправить текст прежде чем перейти к следующему шагу⚠\n\nИначе необходимое текстовое сопровождение не добавиться к задачи.",
         reply_markup=keyboard_markup
     )
     user_data[message.from_user.id] = {
@@ -56,7 +56,7 @@ async def input_financial_performance_report_description_handler_without_date(qu
 
     keyboard_markup = await financial_performance_report_description_keyboard(user_data["prev_action"])
     await query.message.edit_text(
-        text="Вы пропустили добавление даты периода.\nОпишите задачу подробнее, если это требуется",
+        text="Вы пропустили добавление даты периода.\nОпишите задачу подробнее, если это требуется\n\n⚠Не забудьте отправить текст прежде чем перейти к следующему шагу⚠\n\nИначе необходимое текстовое сопровождение не добавиться к задачи.",
         reply_markup=keyboard_markup
     )
 

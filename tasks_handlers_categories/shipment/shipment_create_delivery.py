@@ -10,37 +10,37 @@ from tasks_handlers_categories.shipment.markups_templates.shipment_create_delive
 from main import bot
 from task_handlers import task_info
 
-async def shipment_create_delivery_warehouse_handler(query: CallbackQuery, user_data, **kwargs):
-    task_info["task_subcategory"] = "Отчет по остаткам с разбивкой по складам"
+async def shipment_create_delivery_handler(query: CallbackQuery, user_data, **kwargs):
+    task_info["task_subcategory"] = "Создать поставку"
     user_data[query.from_user.id] = {
         "current_message": "shipment_create_delivery_date",
         "last_bot_message_id": query.message.message_id
     }
-    keyboard_markup = await shipment_create_delivery_date_keyboard(user_data["prev_action"])
-    user_data["prev_action"] = "report_section_financial"
+    keyboard_markup = await shipment_create_delivery_data_keyboard("task_delivery")
+    user_data["prev_action"] = "create_delivery_shipment"
 
-    await query.message.edit_text(text="Выберите склад для расчета поставки из списка:", reply_markup=keyboard_markup)
+    await query.message.edit_text(text="Выберите данные для подтверждения поставки:", reply_markup=keyboard_markup)
     await query.answer()
 
 #Получение склада
 #Ожидание описания задачи
-async def input_shipment_create_delivery_warehouse_handler(query: CallbackQuery, user_data, warehouse_action, **kwargs):
-    if (warehouse_action == "task_shipment_create_delivery_continue_center"):
-        task_info["warehouse"] = "Центральный"
-    elif (warehouse_action == "task_shipment_create_delivery_continue_region"):
-        task_info["warehouse"] = "Региональный"
-    elif (warehouse_action == "task_shipment_create_delivery_continue_all"):
-        task_info["warehouse"] = "Все"
+async def input_shipment_create_delivery_type_handler(query: CallbackQuery, user_data, warehouse_action, **kwargs):
+    if (warehouse_action == "task_shipment_create_prev_data"):
+        task_info["task_action"] = "Существующие данные"
+    elif (warehouse_action == "task_shipment_create_contact"):
+        task_info["task_action"] = "Требует согласования"
     else:
-        task_info["warehouse"] = "-"
+        task_info["task_action"] = "-"
+
+    keyboard_markup = await shipment_create_delivery_description_keyboard(user_data["prev_action"])
+
     user_data[query.from_user.id] = {
         "current_message": "shipment_create_delivery_description",
         "last_bot_message_id": query.message.message_id
     }
 
-    keyboard_markup = await shipment_create_delivery_description_keyboard(user_data["prev_action"])
     await query.message.edit_text(
-        text="Склад записан.\nОпишите задачу подробнее, если это требуется",
+        text="Склад записан.\nОпишите задачу подробнее, если это требуется\n\n⚠Не забудьте отправить текст прежде чем перейти к следующему шагу⚠\n\nИначе необходимое текстовое сопровождение не добавиться к задачи.",
         reply_markup=keyboard_markup
     )
 
@@ -59,7 +59,7 @@ async def input_shipment_create_delivery_description_handler(message: types.Mess
         "Пожалуйста, удостоверьтесь в правильности собранных данных:\n"
         f"\n⚪️ Категория задачи: {task_info['task_category']}\n"
         f"\n⚪️ Подкатегория задачи: {task_info['task_subcategory']}\n"
-        f"\n⚪️ Склад поставки: {task_info['warehouse']}\n"
+        f"\n⚪️ Данные для подтверждения поставки: {task_info['task_action']}\n"
         f"\n⚪️ Описание задачи: {task_info['task_description']}"
     )
 
@@ -79,7 +79,7 @@ async def shipment_create_delivery_confirmation_handler_without_description(quer
         "Пожалуйста, удостоверьтесь в правильности собранных данных:\n"
         f"\n⚪️ Категория задачи: {task_info['task_category']}\n"
         f"\n⚪️ Подкатегория задачи: {task_info['task_subcategory']}\n"
-        f"\n⚪️ Склад поставки: {task_info['warehouse']}\n"
+        f"\n⚪️ Данные для подтверждения поставки: {task_info['task_action']}\n"
         f"\n⚪️ Описание задачи: {task_info['task_description']}"
     )
 

@@ -23,10 +23,10 @@ async def content_tk_photographer_date_handler(query: CallbackQuery, user_data, 
         "current_message": "content_tk_photographer_date",
         "last_bot_message_id": query.message.message_id
     }
-    keyboard_markup = await content_tk_photographer_goods_info_keyboard(user_data["prev_action"])
+    keyboard_markup = await content_tk_photographer_goods_info_keyboard("task_content")
     user_data["prev_action"] = "tk_photographer_content"
     
-    await query.message.edit_text(text="""Укажите артикул товара на маркетплейсе через запятую или ссылки на исходники товара или референс конкурента через запятую \nТакже можно прикрепить фото, файлы или ссылки на изображения (удостоверьтесь, что к ним открыт доступ)\n⚠Отправляйте не более 10 файлов за раз⚠""",
+    await query.message.edit_text(text="""Укажите артикул товара на маркетплейсе через запятую или ссылки на исходники товара или референс конкурента через запятую \nТакже можно прикрепить фото, файлы или ссылки на изображения (удостоверьтесь, что к ним открыт доступ)\n\n⚠Не забудьте отправить текст прежде чем перейти к следующему шагу⚠\n\nИначе необходимое текстовое сопровождение не добавиться к задачи.\n\n⚠Отправляйте не более 10 файлов за раз⚠""",
     reply_markup=keyboard_markup
     )
     await query.answer()
@@ -58,7 +58,7 @@ async def input_content_tk_photographer_date_handler(message: types.Message, use
         keyboard_markup = await content_tk_photographer_goods_info_keyboard(user_data["prev_action"])
         sent_message = await bot.send_message(
             chat_id=message.chat.id,
-            text="Данные записаны.\nДобавьте другие файлы и/или информацию при необходимости",
+            text="Данные записаны.\nДобавьте другие файлы и/или информацию при необходимости \n\n⚠Отправляйте не более 10 файлов за раз⚠",
             reply_markup=keyboard_markup
         )
         user_data[message.from_user.id] = {
@@ -80,7 +80,7 @@ async def input_content_tk_photographer_description_handler_without_date(query: 
     
     keyboard_markup = await content_tk_photographer_description_keyboard(user_data["prev_action"])
     await query.message.edit_text(
-        text="Опишите задачу подробнее, если это требуется",
+        text="Опишите задачу подробнее, если это требуется\n\n⚠Не забудьте отправить текст прежде чем перейти к следующему шагу⚠\n\nИначе необходимое текстовое сопровождение не добавиться к задачи.",
         reply_markup=keyboard_markup
     )
 #Получение описание задачи
