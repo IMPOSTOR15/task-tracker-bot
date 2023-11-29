@@ -19,7 +19,7 @@ async def finance_report_price_increase_date_handler(query: CallbackQuery, user_
     keyboard_markup = await finance_report_price_increase_date_keyboard("task_finance")
     user_data["prev_action"] = "report_increase_financial"
 
-    await query.message.edit_text(text="Выберите дату начала периода отчета и Выберите дату конца периода отчета.\n Пример: 09.09.2023 - 18.09.2023", reply_markup=keyboard_markup)
+    await query.message.edit_text(text="Выберите дату начала периода отчета и Выберите дату конца периода отчета.\n Пример: 09.09.2023 - 18.09.2023\n\n⚠Не забудьте отправить текст прежде чем перейти к следующему шагу⚠\n\nИначе необходимое текстовое сопровождение не добавиться к задачи.", reply_markup=keyboard_markup)
     await query.answer()
 
 #Получение даты анализа

@@ -19,7 +19,7 @@ async def shipment_acceptance_control_date_handler(query: CallbackQuery, user_da
     keyboard_markup = await shipment_acceptance_control_date_keyboard("task_delivery")
     user_data["prev_action"] = "acceptance_control_shipment"
 
-    await query.message.edit_text(text="Выберите дату осуществления приемки (можно выбрать дату не старше текущей)", reply_markup=keyboard_markup)
+    await query.message.edit_text(text="Выберите дату осуществления приемки (можно выбрать дату не старше текущей) \n\n⚠Не забудьте отправить текст прежде чем перейти к следующему шагу⚠\n\nИначе необходимое текстовое сопровождение не добавиться к задачи.", reply_markup=keyboard_markup)
     await query.answer()
 
 #Получение даты анализа
