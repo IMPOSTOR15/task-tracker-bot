@@ -89,6 +89,7 @@ async def input_content_tk_designer_description_handler_without_date(query: Call
 #Ожидание подтверждения
 async def input_content_tk_designer_description_handler(message: types.Message, user_data, **kwargs):
     global task_info
+    user_data[message.from_user.id] = { "current_message": "" }
     default_value = "-"
 
     task_category = task_info.get('task_category', default_value)
@@ -124,6 +125,7 @@ async def input_content_tk_designer_description_handler(message: types.Message, 
 #Ожидание подтверждения
 async def content_tk_designer_confirmation_handler_without_description(query: CallbackQuery, user_data, **kwargs):
     global task_info
+    user_data[query.from_user.id] = { "current_message": "" }
     default_value = "-"
 
     task_category = task_info.get('task_category', default_value)

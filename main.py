@@ -4,7 +4,7 @@ import os
 import shlex
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import CallbackQuery
-from dbtools import get_chat_sheet, init_db, create_pool, insert_chat_sheet
+from dbtools import delete_chat_id_from_alert, get_chat_sheet, init_db, create_pool, insert_chat_id_to_alert, insert_chat_sheet
 
 load_dotenv()
 # python pip install python-dotenv aiogram asyncio gspread oauth2client asyncpg
@@ -49,7 +49,9 @@ from tasks_handlers_categories.content.content_collect_seo import *
 from tasks_handlers_categories.text_content.text_content_refresh import *
 user_data = {}
 
-@dp.message_handler(commands=['start'])
+
+
+@dp.message_handler(commands=['go'])
 async def cmd_start(message: types.Message):
     user_data["user_id"] = message.from_user.id
     keyboard_markup = await main_task_keyboard()
@@ -107,7 +109,38 @@ async def cmd_register_link(message: types.Message):
             await bot.send_message(chat_id=chat_id, text=f"Ошибка при регистрации ссылки на таблицу: '{table_link}'. \n {e}")
     else:
         await bot.send_message(chat_id=message.chat.id, text="Пожалуйста, укажите ссылку на таблицу после команды.")
-        
+
+
+@dp.message_handler(commands=['addnotify'])
+async def cmd_register_link(message: types.Message):
+    args = shlex.split(message.get_args())
+    if args:
+        sheet_name = args[0]
+        chat_id = message.chat.id
+
+        try:
+            await insert_chat_id_to_alert(chat_id, sheet_name)
+            await bot.send_message(chat_id=chat_id, text=f"Лист селлера '{sheet_name}' зарегистрирован в этом чате для уведомлений.")
+        except Exception as e:
+            await bot.send_message(chat_id=chat_id, text=f"Ошибка при регистрации листа селлера: '{sheet_name}'. \n {e}")
+    else:
+        await bot.send_message(chat_id=message.chat.id, text="Пожалуйста, укажите название листа селлера после команды.")
+
+@dp.message_handler(commands=['stopnotify'])
+async def cmd_register_link(message: types.Message):
+    args = shlex.split(message.get_args())
+    if args:
+        sheet_name = args[0]
+        chat_id = message.chat.id
+
+        try:
+            await delete_chat_id_from_alert(chat_id, sheet_name)
+            await bot.send_message(chat_id=chat_id, text=f"Лист селлера '{sheet_name}' убран из этого чата для уведомлений.")
+        except Exception as e:
+            await bot.send_message(chat_id=chat_id, text=f"Ошибка при удалении листа селлера: '{sheet_name}'. \n {e}")
+    else:
+        await bot.send_message(chat_id=message.chat.id, text="Пожалуйста, укажите название листа селлера после команды.")        
+
 # Инцеденты
 @dp.callback_query_handler(menu_cd.filter(action="incedent"))
 async def process_incedent_type_handler(query: CallbackQuery, callback_data: dict, **kwargs):

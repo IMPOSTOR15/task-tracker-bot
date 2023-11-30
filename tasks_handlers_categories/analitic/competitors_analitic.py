@@ -44,6 +44,7 @@ async def input_competitors_links_handler(message: types.Message, user_data, **k
 #Ожидание описания задачи
 async def input_competitors_description_handler_without_links(query: CallbackQuery, user_data, **kwargs):
     task_info["competitors_links"] = "-"
+    
     user_data[query.from_user.id] = {
         "current_message": "competitors_analitic_description",
         "last_bot_message_id": query.message.message_id
@@ -59,6 +60,8 @@ async def input_competitors_description_handler_without_links(query: CallbackQue
 async def input_competitors_description_handler(message: types.Message, user_data, **kwargs):
     global task_info
     task_info["task_description"] = message.text
+    user_data[message.from_user.id] = { "current_message": "" }
+
     await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
     if "last_bot_message_id" in user_data[message.from_user.id]:
         await bot.delete_message(chat_id=message.chat.id, message_id=user_data[message.from_user.id]["last_bot_message_id"])
@@ -85,7 +88,8 @@ async def input_competitors_description_handler(message: types.Message, user_dat
 async def competitors_confirmation_handler_without_description(query: CallbackQuery, user_data, **kwargs):
     global task_info
     task_info = clean_task_info(task_info)
-
+    user_data[query.from_user.id] = { "current_message": "" }
+    
     confirmation_message = (
         "Пожалуйста, удостоверьтесь в правильности собранных данных:\n"
         f"\n⚪️ Категория задачи: {task_info['task_category']}\n"

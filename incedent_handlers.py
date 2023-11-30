@@ -5,7 +5,7 @@ from aiogram.utils.callback_data import CallbackData
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, InputFile, ParseMode
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from dbtools import get_sheet_name_by_chat_id, get_sheet_url_by_chat_id, insert_incedent
+from dbtools import get_chat_id_to_alert, get_sheet_name_by_chat_id, get_sheet_url_by_chat_id, insert_incedent
 from google_sheets.google_sheets_tools import add_incedent_row_to_sheet
 
 from incedent_markups import *
@@ -91,6 +91,7 @@ async def description_incedent_handler(query: CallbackQuery, user_data, action, 
 
 async def description_incedent_input(message: types.Message, user_data, **kwargs):
     incedent_info["incedent_description"] = message.text
+    user_data[message.from_user.id] = {"current_message": ""}
 
     await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
 
@@ -116,7 +117,8 @@ async def description_incedent_input(message: types.Message, user_data, **kwargs
 
 async def description_incedent_input_without_description(query: CallbackQuery, user_data, **kwargs):
     incedent_info["incedent_description"] = ''
-    
+    user_data[query.from_user.id] = {"current_message": ""}
+
     print(incedent_info)
     confirmation_message = (
         "Пожалуйста, удостоверьтесь в правильности собранных данных:\n"
@@ -132,14 +134,38 @@ async def description_incedent_input_without_description(query: CallbackQuery, u
 
 async def confirmed_incedent(query: CallbackQuery, user_data, **kwargs):
     chat_id = query.message.chat.id
-    # Добавить логику по добавлению инцедента в бд и отправки уведомления и гугл таблица тоже
     await insert_incedent(**incedent_info)
     print(incedent_info)
     sheet_name = await get_sheet_name_by_chat_id(chat_id)
     sheet_url = await get_sheet_url_by_chat_id(chat_id)
+
+    alert_chat_id = await get_chat_id_to_alert(sheet_name)
+    if alert_chat_id:
+        try:
+            await notifyIncedent(alert_chat_id, incedent_info, sheet_url, sheet_name)
+        except Exception as e:
+            print(f"Ошибка при отправке уведомления: {e}")
+
     add_incedent_row_to_sheet(sheet_url, sheet_name, incedent_info)
     keyboard_markup = await incedent_writed_kayboard()
     await query.message.edit_text(
-        text="Инцедент успешно добавлен",
+        text="Инцидент успешно добавлен",
         reply_markup=keyboard_markup
+    )
+
+
+
+async def notifyIncedent(alert_chat_id, incedent_info, sheet_url, sheet_name):
+    alert_message = (
+        "Создан новый инцедент:\n"
+        f"\n⚪️ Тип инцидента: {incedent_info['type']}\n"
+        f"\n⚪️ Категория работы: {incedent_info['work_category']}\n"
+        f"\n⚪️ Описание инцидента: {incedent_info['incedent_description']}\n"
+        f"\n\n Таблица задач: {sheet_url}"
+        f"\n Название листа: {sheet_name}"
+    )   
+
+    await bot.send_message(
+        chat_id=alert_chat_id,
+        text=alert_message,
     )

@@ -29,6 +29,7 @@ async def text_content_refresh_sku_handler(query: CallbackQuery, user_data, **kw
 
 async def input_text_content_refresh_type_handler(message: types.Message, user_data, **kwargs):
     global task_info
+    
     if message.text:
         task_info["goods_info"] = message.text
     else:
@@ -129,6 +130,7 @@ async def input_text_content_refresh_description_handler_without_data(query: Cal
 #Ожидание подтверждения
 async def input_text_content_refresh_confirmation_handler(message: types.Message, user_data, **kwargs):
     global task_info
+    user_data[message.from_user.id] = { "current_message": "" }
     task_info["task_description"] = message.text
     await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
     if "last_bot_message_id" in user_data[message.from_user.id]:
@@ -156,7 +158,7 @@ async def input_text_content_refresh_confirmation_handler(message: types.Message
 #Если описание не ввели
 #Ожидание подтверждения
 async def text_content_refresh_confirmation_handler_without_description(query: CallbackQuery, user_data, **kwargs):
-    
+    user_data[query.from_user.id] = { "current_message": "" }
 
     global task_info
     task_info = clean_task_info(task_info)

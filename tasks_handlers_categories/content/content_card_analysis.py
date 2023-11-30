@@ -79,6 +79,7 @@ async def input_content_card_analysis_description_handler_without_goods_ids(quer
 #Ожидание подтверждения
 async def input_content_card_analysis_confirmation_handler(message: types.Message, user_data, **kwargs):
     global task_info
+    user_data[message.from_user.id] = { "current_message": "" }
     task_info["task_description"] = message.text
     await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
     if "last_bot_message_id" in user_data[message.from_user.id]:
@@ -105,6 +106,7 @@ async def input_content_card_analysis_confirmation_handler(message: types.Messag
 #Ожидание подтверждения
 async def content_card_analysis_confirmation_handler_without_description(query: CallbackQuery, user_data, **kwargs):
     global task_info
+    user_data[query.from_user.id] = { "current_message": "" }
     task_info = clean_task_info(task_info)
     confirmation_message = (
         "Пожалуйста, удостоверьтесь в правильности собранных данных:\n"

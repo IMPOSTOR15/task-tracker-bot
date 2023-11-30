@@ -237,3 +237,65 @@ async def mark_task_id_file(task_id: int, file_path: str):
             task_id,
             file_path
         )
+
+
+async def get_chat_id_to_alert(sheet_name: str):
+    async with PoolConnection() as conn:
+        row = await conn.fetchrow(
+            """
+            SELECT chat_id FROM alerts_chats
+            WHERE sheet_name = $1
+            """,
+            sheet_name
+        )
+        if row:
+            return row['chat_id']
+        else:
+            return None
+
+
+async def insert_chat_id_to_alert(chat_id: int, sheet_name: str):
+    async with PoolConnection() as conn:
+        existing_record = await conn.fetchrow(
+            """
+            SELECT 1 FROM alerts_chats
+            WHERE chat_id = $1 AND sheet_name = $2
+            """,
+            chat_id,
+            sheet_name
+        )
+
+        if not existing_record:
+            await conn.execute(
+                """
+                INSERT INTO alerts_chats (
+                    chat_id,
+                    sheet_name
+                ) VALUES ($1, $2)
+                """,
+                chat_id,
+                sheet_name
+            )
+
+
+
+async def delete_chat_id_from_alert(chat_id: int, sheet_name: str):
+    async with PoolConnection() as conn:
+        existing_record = await conn.fetchrow(
+            """
+            SELECT 1 FROM alerts_chats
+            WHERE chat_id = $1 AND sheet_name = $2
+            """,
+            chat_id,
+            sheet_name
+        )
+
+        if existing_record:
+            await conn.execute(
+                """
+                DELETE FROM alerts_chats
+                WHERE chat_id = $1 AND sheet_name = $2
+                """,
+                chat_id,
+                sheet_name
+            )
