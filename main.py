@@ -44,9 +44,13 @@ from tasks_handlers_categories.content.content_tk_photographer import *
 from tasks_handlers_categories.content.content_tk_designer import *
 from tasks_handlers_categories.content.content_creating_infographics import *
 from tasks_handlers_categories.content.content_upload_image import *
+from tasks_handlers_categories.content.content_new_card import*
+from tasks_handlers_categories.content.content_update_card import*
 from tasks_handlers_categories.content.content_collect_seo import *
 # Импорты текстового контента
 from tasks_handlers_categories.text_content.text_content_refresh import *
+# Импорты свободной задачи
+from tasks_handlers_categories.free.free_task import *
 user_data = {}
 
 
@@ -626,6 +630,49 @@ async def process_input_content_upload_image_confirmation_handler(message: types
 async def process_content_upload_image_confirmation_handler_without_description(query: CallbackQuery, callback_data: dict, **kwargs):
     await content_upload_image_confirmation_handler_without_description(query, user_data, **kwargs)
 
+#Создание новой карточки
+@dp.callback_query_handler(task_cd.filter(action="new_card_content"))
+async def process_content_new_card_date_handler(query: CallbackQuery, callback_data: dict, **kwargs):
+    await content_new_card_date_handler(query, user_data, **kwargs)
+
+@dp.message_handler(lambda message: message.from_user.id in user_data and user_data[message.from_user.id].get("current_message") == "content_new_card_date", content_types=['text', 'photo', 'document'])
+async def process_input_content_new_card_date_handler(message: types.Message, **kwargs):
+    print('start handler')
+    await input_content_new_card_date_handler(message, user_data, **kwargs)
+
+@dp.callback_query_handler(task_cd.filter(action="task_content_new_card_continue_no_date"))
+async def process_input_content_new_card_description_handler_without_date(query: CallbackQuery, callback_data: dict, **kwargs):
+    await input_content_new_card_description_handler_without_date(query, user_data, **kwargs)
+
+@dp.message_handler(lambda message: message.from_user.id in user_data and user_data[message.from_user.id].get("current_message") == "content_new_card_description")
+async def process_input_content_new_card_description_handler(message: types.Message, **kwargs):
+    await input_content_new_card_description_handler(message, user_data, **kwargs)
+
+@dp.callback_query_handler(task_cd.filter(action="task_content_new_card_continue_no_description"))
+async def process_content_new_card_confirmation_handler_without_description(query: CallbackQuery, callback_data: dict, **kwargs):
+    await content_new_card_confirmation_handler_without_description(query, user_data, **kwargs)
+
+#Обновление карточки
+@dp.callback_query_handler(task_cd.filter(action="update_card_content"))
+async def process_content_update_card_date_handler(query: CallbackQuery, callback_data: dict, **kwargs):
+    await content_update_card_date_handler(query, user_data, **kwargs)
+
+@dp.message_handler(lambda message: message.from_user.id in user_data and user_data[message.from_user.id].get("current_message") == "content_update_card_date", content_types=['text', 'photo', 'document'])
+async def process_input_content_update_card_date_handler(message: types.Message, **kwargs):
+    print('start handler')
+    await input_content_update_card_date_handler(message, user_data, **kwargs)
+
+@dp.callback_query_handler(task_cd.filter(action="task_content_update_card_continue_no_date"))
+async def process_input_content_update_card_description_handler_without_date(query: CallbackQuery, callback_data: dict, **kwargs):
+    await input_content_update_card_description_handler_without_date(query, user_data, **kwargs)
+
+@dp.message_handler(lambda message: message.from_user.id in user_data and user_data[message.from_user.id].get("current_message") == "content_update_card_description")
+async def process_input_content_update_card_description_handler(message: types.Message, **kwargs):
+    await input_content_update_card_description_handler(message, user_data, **kwargs)
+
+@dp.callback_query_handler(task_cd.filter(action="task_content_update_card_continue_no_description"))
+async def process_content_update_card_confirmation_handler_without_description(query: CallbackQuery, callback_data: dict, **kwargs):
+    await content_update_card_confirmation_handler_without_description(query, user_data, **kwargs)
 
 #Собрать SEO
 @dp.callback_query_handler(task_cd.filter(action="collect_seo_content"))
@@ -680,6 +727,21 @@ async def process_text_content_refresh_confirmation_handler_without_description(
 @dp.callback_query_handler(task_cd.filter(action="task_confirm"))
 async def process_confirm_task(query: CallbackQuery, callback_data: dict, **kwargs):
     await confirmed_task(query, user_data, **kwargs)
+
+
+#Свободная задача
+@dp.callback_query_handler(task_cd.filter(action="task_free"))
+async def process_free_task_date_handler(query: CallbackQuery, callback_data: dict, **kwargs):
+    await free_task_date_handler(query, user_data, **kwargs)
+
+@dp.message_handler(lambda message: message.from_user.id in user_data and user_data[message.from_user.id].get("current_message") == "free_task_date", content_types=['text', 'photo', 'document'])
+async def process_input_free_task_date_handler(message: types.Message, **kwargs):
+    print('start handler')
+    await input_free_task_date_handler(message, user_data, **kwargs)
+
+@dp.callback_query_handler(task_cd.filter(action="free_task_continue"))
+async def process_input_free_task_description_handler_without_date(query: CallbackQuery, callback_data: dict, **kwargs):
+    await input_free_task_description_handler_without_date(query, user_data, **kwargs)
 
 async def main():
     await create_pool()

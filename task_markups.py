@@ -13,12 +13,14 @@ async def task_work_keyboard():
     delivery_task_work_btn = InlineKeyboardButton("Поставки", callback_data=task_cd.new(action="task_delivery"))
     content_task_work_btn = InlineKeyboardButton("Контент", callback_data=task_cd.new(action="task_content"))
     refresh_content_task_work_btn = InlineKeyboardButton("Обновить текстовый контент", callback_data=task_cd.new(action="task_refresh_content"))
+    free_task_btn = InlineKeyboardButton("Свободная задача", callback_data=task_cd.new(action="task_free"))
 
     keyboard.add(analitic_task_work_btn)
     keyboard.add(finance_task_work_btn)
     keyboard.add(delivery_task_work_btn)
     keyboard.add(content_task_work_btn)
     keyboard.add(refresh_content_task_work_btn)
+    keyboard.add(free_task_btn)
     keyboard.add(back_button())
     return keyboard
 
@@ -74,6 +76,8 @@ async def task_content_keyboard():
     tk_designer_content_task_btn = InlineKeyboardButton("ТЗ для дизайнера", callback_data=task_cd.new(action="tk_designer_content"))
     infographics_content_task_btn = InlineKeyboardButton("Создание инфографики", callback_data=task_cd.new(action="infographics_content"))
     new_image_content_task_btn = InlineKeyboardButton("Загрузить новое изображение", callback_data=task_cd.new(action="new_image_content"))
+    new_card_content_task_btn = InlineKeyboardButton("Создать новую карточку", callback_data=task_cd.new(action="new_card_content"))
+    upd_card_content_task_btn = InlineKeyboardButton("Изменить существующую карточку", callback_data=task_cd.new(action="update_card_content"))
     collect_seo_content_task_btn = InlineKeyboardButton("Собрать SEO", callback_data=task_cd.new(action="collect_seo_content"))
 
     keyboard.add(card_analysis_content_task_btn)
@@ -81,6 +85,8 @@ async def task_content_keyboard():
     keyboard.add(tk_designer_content_task_btn)
     keyboard.add(infographics_content_task_btn)
     keyboard.add(new_image_content_task_btn)
+    keyboard.add(new_card_content_task_btn)
+    keyboard.add(upd_card_content_task_btn)
     keyboard.add(collect_seo_content_task_btn)
     keyboard.add(back_button(action_name = "task"))
     return keyboard
