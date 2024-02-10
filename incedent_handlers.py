@@ -134,7 +134,7 @@ async def description_incedent_input_without_description(query: CallbackQuery, u
 
 async def confirmed_incedent(query: CallbackQuery, user_data, **kwargs):
     chat_id = query.message.chat.id
-    await insert_incedent(**incedent_info)
+    incedent_id = await insert_incedent(**incedent_info)
     print(incedent_info)
     sheet_name = await get_sheet_name_by_chat_id(chat_id)
     sheet_url = await get_sheet_url_by_chat_id(chat_id)
@@ -146,7 +146,7 @@ async def confirmed_incedent(query: CallbackQuery, user_data, **kwargs):
         except Exception as e:
             print(f"Ошибка при отправке уведомления: {e}")
 
-    add_incedent_row_to_sheet(sheet_url, sheet_name, incedent_info)
+    add_incedent_row_to_sheet(sheet_url, sheet_name, incedent_info, incedent_id)
     keyboard_markup = await incedent_writed_kayboard()
     await query.message.edit_text(
         text="Инцидент успешно добавлен",

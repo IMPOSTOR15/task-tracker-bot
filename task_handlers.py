@@ -98,7 +98,7 @@ async def confirmed_task(query: CallbackQuery, user_data, **kwargs):
     
     sheet_name = await get_sheet_name_by_chat_id(chat_id)
     sheet_url = await get_sheet_url_by_chat_id(chat_id)
-    add_row_to_sheet(sheet_url, sheet_name, task_info_data)
+    add_row_to_sheet(sheet_url, sheet_name, task_info_data, current_task_id)
 
     await query.message.edit_text(
         text="Задача успешно добавлена",

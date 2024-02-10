@@ -40,8 +40,8 @@ async def init_db():
                 chat_id BIGINT,
                 task_date TEXT,
                 task_report_week TEXT,
-                warehouse TEXT
-                is_complete BOOLEAN
+                warehouse TEXT,
+                is_complete TEXT
             )
         """)
         await conn.execute("""
@@ -49,7 +49,8 @@ async def init_db():
                 id BIGINT PRIMARY KEY,
                 type TEXT,
                 work_category TEXT,
-                incedent_description TEXT
+                incedent_description TEXT,
+                is_complete TEXT
             )
         """)
         await conn.execute("""
@@ -128,7 +129,7 @@ async def insert_task(
         task_date: str = "-",
         task_report_week: str = "-",
         warehouse: str = "-",
-        is_complete: bool = False,
+        is_complete: str = "-"
     ) -> int:
     async with PoolConnection() as conn:
         row = await conn.fetchrow(
@@ -148,7 +149,7 @@ async def insert_task(
                 task_report_week,
                 warehouse,
                 is_complete
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
             RETURNING id
             """,
             task_category,
@@ -172,21 +173,26 @@ async def insert_task(
 async def insert_incedent(
         type: str = "-",
         work_category: str = "-",
-        incedent_description: str = "-"
-    ):
+        incedent_description: str = "-",
+        is_complete: str = "-"
+    ) -> int:
     async with PoolConnection() as conn:
-        await conn.execute(
+        row = await conn.fetchrow(
             """
             INSERT INTO incedents (
                 type,
                 work_category,
-                incedent_description
-            ) VALUES ($1, $2, $3)
+                incedent_description,
+                is_complete
+            ) VALUES ($1, $2, $3, $4)
+            RETURNING id
             """,
             type,
             work_category,
-            incedent_description
+            incedent_description,
+            is_complete
         )
+        return row['id']
 
 async def insert_file_photo(
         type: str = "photo",
@@ -303,3 +309,39 @@ async def delete_chat_id_from_alert(chat_id: int, sheet_name: str):
                 chat_id,
                 sheet_name
             )
+
+async def update_status_and_fetch_differences(items):
+    async with PoolConnection() as conn:
+        updated_items = []
+        print(items)
+        for item in items:
+            if item['type'] == 'Неизвестно':
+                continue
+            table_name = 'tasks' if item['type'] == 'Задача' else 'incedents'
+            existing_status = await conn.fetchval(
+                f"""
+                SELECT is_complete FROM {table_name}
+                WHERE id = $1
+                """,
+                int(item['id'])
+            )
+
+            existing_status = '' if existing_status == '-' else existing_status
+            print(existing_status)
+            print(item['status'])
+            if existing_status != item['status']:
+                await conn.execute(
+                    f"""
+                    UPDATE {table_name}
+                    SET is_complete = $1
+                    WHERE id = $2
+                    """,
+                    item['status'], int(item['id'])
+                )
+                updated_items.append({
+                    "id": item['id'],
+                    "type": item['type'],
+                    "status": item['status']
+                })
+
+        return updated_items

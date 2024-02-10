@@ -2,6 +2,7 @@ from datetime import datetime
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from dotenv import load_dotenv
+from dbtools import update_status_and_fetch_differences
 import os
 
 load_dotenv()
@@ -10,8 +11,7 @@ def transform_paths(paths):
     current_host = os.getenv('HOST_NAME')
     return [current_host + '/'.join(path.split('/')[2:]) for path in paths]
 
-def add_row_to_sheet(sheet_url, sheet_name, task_info):
-
+def add_row_to_sheet(sheet_url, sheet_name, task_info, task_id):
     # Авторизация и получение таблицы
     scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
     creds = ServiceAccountCredentials.from_json_keyfile_name('./credentials/bot-task-tracker-2cbdc3a7ab62.json', scope)
@@ -19,7 +19,7 @@ def add_row_to_sheet(sheet_url, sheet_name, task_info):
     sheet = client.open_by_url(sheet_url).worksheet(sheet_name)
 
     # Находим первую пустую строку
-    all_values = sheet.col_values(2)
+    all_values = sheet.col_values(2)  # Проверка второго столбца для нахождения пустой строки
     empty_row = len(all_values) + 1
     for i, value in enumerate(all_values, start=1):
         if value == '':
@@ -46,9 +46,9 @@ def add_row_to_sheet(sheet_url, sheet_name, task_info):
     # Собираем данные для записи с описаниями, исключая значения равные '-'
     info_keys = list(info_descriptions.keys())
     info_values = [f"{info_descriptions[key]}: {task_info.get(key, '')}" 
-                for key in info_keys if task_info.get(key, '') != '-']
+                   for key in info_keys if task_info.get(key, '') != '-']
 
-    # Преобразование путей фотографий и документов, исключая значения равные '-'
+    # Преобразование путей фотографий и документов
     photo_paths = [path for path in transform_paths(task_info.get('photo_paths', [])) if path != '-']
     document_paths = [path for path in transform_paths(task_info.get('document_paths', [])) if path != '-']
 
@@ -58,15 +58,19 @@ def add_row_to_sheet(sheet_url, sheet_name, task_info):
     if document_paths:
         info_values.append('Документы:\n' + '\n'.join(document_paths))
 
+    # Добавление строки "Задача:" в начало списка info_values
+    info_values.insert(0, "Задача:")
+
     combined_info = '\n'.join(info_values)
 
-    # Обновление данных в таблице
-    sheet.update(f'J{empty_row}:J{empty_row}', [[task_category]])  # Категория задачи
-    sheet.update(f'B{empty_row}:B{empty_row}', [[task_date]])     # Дата задачи
-    sheet.update(f'F{empty_row}:F{empty_row}', [[combined_info]])  # Объединенная информация
+    # Обновление данных в таблице, включая task_id в столбец 'A'
+    sheet.update(f'A{empty_row}', [[task_id]])                      # ID задачи
+    sheet.update(f'J{empty_row}:J{empty_row}', [[task_category]])   # Категория задачи
+    sheet.update(f'B{empty_row}:B{empty_row}', [[task_date]])       # Дата задачи
+    sheet.update(f'F{empty_row}:F{empty_row}', [[combined_info]])   # Объединенная информацияи
 
 
-def add_incedent_row_to_sheet(sheet_url, sheet_name, incident_info):
+def add_incedent_row_to_sheet(sheet_url, sheet_name, incident_info, incident_id):
     # Авторизация и получение таблицы
     scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
     creds = ServiceAccountCredentials.from_json_keyfile_name('./credentials/bot-task-tracker-2cbdc3a7ab62.json', scope)
@@ -86,10 +90,47 @@ def add_incedent_row_to_sheet(sheet_url, sheet_name, incident_info):
     work_category = incident_info.get('work_category', '')
     incident_description = incident_info.get('incedent_description', '')
 
-    incedent_info = f'{incident_type}\n{incident_description}'
+    incident_info_combined = f'Инцидент:\n{incident_type}\n{incident_description}'
     incident_date = datetime.now().strftime('%Y-%m-%d')
 
-    # Обновление данных в таблице
-    sheet.update(f'F{empty_row}:F{empty_row}', [[incedent_info]])
-    sheet.update(f'J{empty_row}:J{empty_row}', [[work_category]])
+    # Обновление данных в таблице, включая incident_id в столбец 'A'
+    sheet.update(f'A{empty_row}', [[incident_id]])                        # ID инцидента
+    sheet.update(f'F{empty_row}:F{empty_row}', [[incident_info_combined]]) # Информация об инциденте
+    sheet.update(f'J{empty_row}:J{empty_row}', [[work_category]])         # Категория работы
     sheet.update(f'B{empty_row}:B{empty_row}', [[incident_date]])
+
+
+
+def fetch_rows_from_sheet(sheet_url, sheet_name):
+    scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
+    creds = ServiceAccountCredentials.from_json_keyfile_name('./credentials/bot-task-tracker-2cbdc3a7ab62.json', scope)
+    client = gspread.authorize(creds)
+    sheet = client.open_by_url(sheet_url).worksheet(sheet_name)
+
+    # Получение значений столбцов
+    ids = sheet.col_values(1)
+    infos = sheet.col_values(6)
+    statuses = sheet.col_values(9)
+
+    # Определение наименьшей длины среди списков, чтобы избежать IndexError
+    min_length = min(len(ids), len(infos), len(statuses))
+
+    rows = []
+    for i in range(1, min_length):  # Начинаем с 1, чтобы пропустить заголовки столбцов, если они есть
+        type_info = "Неизвестно"
+        info = infos[i] if i < len(infos) else ""
+        status = statuses[i] if i < len(statuses) else ""
+
+        if info.startswith("Инцидент"):
+            type_info = "Инцидент"
+        elif info.startswith("Задача"):
+            type_info = "Задача"
+
+        row_object = {
+            "id": ids[i],
+            "type": type_info,
+            "status": status
+        }
+        rows.append(row_object)
+
+    return rows

@@ -744,9 +744,13 @@ async def process_input_free_task_description_handler_without_date(query: Callba
     await input_free_task_description_handler_without_date(query, user_data, **kwargs)
 
 async def main():
+    print('start')
     await create_pool()
+    print('create pool')
     await init_db()
+    print('init_db')
     await dp.start_polling()
+    print('dp.start_polling')
 
 if __name__ == '__main__':
     asyncio.run(main())
