@@ -24,7 +24,7 @@ async def content_update_card_date_handler(query: CallbackQuery, user_data, **kw
         "last_bot_message_id": query.message.message_id
     }
     keyboard_markup = await content_update_card_info_keyboard("task_content")
-    user_data["prev_action"] = "tk_photographer_content"
+    user_data["prev_action"] = "update_card_content"
     
     await query.message.edit_text(text="""Задание на изменение существующей карточки на маркетплейсе.\n\nУкажите ссылку на карточку или укажите артикул товара на маркетплейсе\n\nТакже укажите ссылку на документ/таблицу с описание контента для новой карточки или текстово описать что нужно сделать\n\nВо избежании возникновения ошибок рекомендуем скопировать [таблицу](https://docs.google.com/spreadsheets/d/1bxNeBY--SLIsKCbQxemW1tOsFPSvKO49uDAbP5gcW0Y/edit#gid=377176396)""",
     reply_markup=keyboard_markup,

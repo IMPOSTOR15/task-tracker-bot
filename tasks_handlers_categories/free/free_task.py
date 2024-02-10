@@ -22,8 +22,8 @@ async def free_task_date_handler(query: CallbackQuery, user_data, **kwargs):
         "current_message": "free_task_date",
         "last_bot_message_id": query.message.message_id
     }
-    keyboard_markup = await free_task_info_start_keyboard("task_content")
-    user_data["prev_action"] = "tk_photographer_content"
+    keyboard_markup = await free_task_info_start_keyboard()
+    user_data["prev_action"] = "task_free"
     
     await query.message.edit_text(
         text="""Свободная задача\n\nОпишите, что необходимо сделать""",

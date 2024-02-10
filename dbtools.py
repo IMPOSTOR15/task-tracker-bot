@@ -41,6 +41,7 @@ async def init_db():
                 task_date TEXT,
                 task_report_week TEXT,
                 warehouse TEXT
+                is_complete BOOLEAN
             )
         """)
         await conn.execute("""
@@ -127,6 +128,7 @@ async def insert_task(
         task_date: str = "-",
         task_report_week: str = "-",
         warehouse: str = "-",
+        is_complete: bool = False,
     ) -> int:
     async with PoolConnection() as conn:
         row = await conn.fetchrow(
@@ -144,7 +146,8 @@ async def insert_task(
                 chat_id,
                 task_date,
                 task_report_week,
-                warehouse
+                warehouse,
+                is_complete
             ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
             RETURNING id
             """,
@@ -160,7 +163,8 @@ async def insert_task(
             chat_id,
             task_date,
             task_report_week,
-            warehouse
+            warehouse,
+            is_complete
         )
         return row['id']
 

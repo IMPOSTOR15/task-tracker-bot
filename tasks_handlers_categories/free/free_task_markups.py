@@ -1,10 +1,10 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from markups import back_button
 from task_markups import task_cd
-
-async def free_task_info_start_keyboard(back_action):
+from markups import menu_cd
+async def free_task_info_start_keyboard():
     keyboard = InlineKeyboardMarkup()
-    keyboard.add(back_button(task_cd, back_action))
+    keyboard.add(back_button(menu_cd, "task"))
     return keyboard
 
 async def free_task_info_keyboard(back_action):
