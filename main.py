@@ -754,7 +754,8 @@ async def notify():
           "У задачи:\n"
           f"{row['info']}\n"
           f"Изменился статус на {row['status']}"
-        )   
+        )
+        print(alert_message)
         await bot.send_message(
           chat_id=chat['chat_id'],
           text=alert_message,
@@ -778,6 +779,6 @@ async def main():
     notify_task = asyncio.create_task(notify_periodically())
     
     await notify_task
-    
+
 if __name__ == '__main__':
     asyncio.run(main())

@@ -313,7 +313,6 @@ async def delete_chat_id_from_alert(chat_id: int, sheet_name: str):
 async def update_status_and_fetch_differences(items):
     async with PoolConnection() as conn:
         updated_items = []
-        print(items)
         for item in items:
             if item['type'] == 'Неизвестно':
                 continue
@@ -327,8 +326,6 @@ async def update_status_and_fetch_differences(items):
             )
 
             existing_status = '' if existing_status == '-' else existing_status
-            print(existing_status)
-            print(item['status'])
             if existing_status != item['status']:
                 await conn.execute(
                     f"""
