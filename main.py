@@ -4,7 +4,8 @@ import os
 import shlex
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import CallbackQuery
-from dbtools import delete_chat_id_from_alert, get_chat_sheet, init_db, create_pool, insert_chat_id_to_alert, insert_chat_sheet
+from dbtools import delete_chat_id_from_alert, get_chat_sheet, init_db, create_pool, insert_chat_id_to_alert, insert_chat_sheet, get_all_chats, update_status_and_fetch_differences
+from google_sheets.google_sheets_tools import fetch_rows_from_sheet
 
 load_dotenv()
 # python pip install python-dotenv aiogram asyncio gspread oauth2client asyncpg
@@ -743,14 +744,40 @@ async def process_input_free_task_date_handler(message: types.Message, **kwargs)
 async def process_input_free_task_description_handler_without_date(query: CallbackQuery, callback_data: dict, **kwargs):
     await input_free_task_description_handler_without_date(query, user_data, **kwargs)
 
+async def notify():
+    chats = await get_all_chats()
+    for chat in chats:
+      rows =  await fetch_rows_from_sheet(chat["table_link"], chat["sheet_name"])
+      updated_rows = await update_status_and_fetch_differences(rows)
+      for row in updated_rows:
+        alert_message = (
+          "У задачи:\n"
+          f"{row['info']}\n"
+          f"Изменился статус на {row['status']}"
+        )   
+        await bot.send_message(
+          chat_id=chat['chat_id'],
+          text=alert_message,
+        )
+
+async def notify_periodically():
+    while True:
+        print("Запуск notify")
+        await notify()
+        print("Завершение notify, ожидание следующего вызова...")
+        await asyncio.sleep(300)
+
 async def main():
     print('start')
     await create_pool()
     print('create pool')
     await init_db()
     print('init_db')
-    await dp.start_polling()
+    asyncio.create_task(dp.start_polling())
     print('dp.start_polling')
-
+    notify_task = asyncio.create_task(notify_periodically())
+    
+    await notify_task
+    
 if __name__ == '__main__':
     asyncio.run(main())

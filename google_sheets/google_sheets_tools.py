@@ -101,16 +101,28 @@ def add_incedent_row_to_sheet(sheet_url, sheet_name, incident_info, incident_id)
 
 
 
-def fetch_rows_from_sheet(sheet_url, sheet_name):
+async def fetch_rows_from_sheet(sheet_url, sheet_name):
     scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
     creds = ServiceAccountCredentials.from_json_keyfile_name('./credentials/bot-task-tracker-2cbdc3a7ab62.json', scope)
     client = gspread.authorize(creds)
-    sheet = client.open_by_url(sheet_url).worksheet(sheet_name)
+
+    try:
+        sheet = client.open_by_url(sheet_url).worksheet(sheet_name)
+    except gspread.exceptions.NoValidUrlKeyFound:
+        print(f"URL {sheet_url} не содержит действительного ключа документа.")
+        return []
+    except gspread.exceptions.WorksheetNotFound:
+        print(f"Лист {sheet_name} не найден.")
+        return []
 
     # Получение значений столбцов
-    ids = sheet.col_values(1)
-    infos = sheet.col_values(6)
-    statuses = sheet.col_values(9)
+    try:
+        ids = sheet.col_values(1)
+        infos = sheet.col_values(6)
+        statuses = sheet.col_values(9)
+    except Exception as e:
+        print(f"Произошла ошибка при получении данных из листа: {e}")
+        return []
 
     # Определение наименьшей длины среди списков, чтобы избежать IndexError
     min_length = min(len(ids), len(infos), len(statuses))
@@ -129,7 +141,8 @@ def fetch_rows_from_sheet(sheet_url, sheet_name):
         row_object = {
             "id": ids[i],
             "type": type_info,
-            "status": status
+            "status": status,
+            "info": info
         }
         rows.append(row_object)
 

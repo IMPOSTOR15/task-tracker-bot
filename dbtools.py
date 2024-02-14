@@ -341,7 +341,25 @@ async def update_status_and_fetch_differences(items):
                 updated_items.append({
                     "id": item['id'],
                     "type": item['type'],
-                    "status": item['status']
+                    "status": item['status'],
+                    "info": item['info']
                 })
 
         return updated_items
+
+async def get_all_chats():
+    chats = []
+    async with PoolConnection() as conn:
+        rows = await conn.fetch(
+            """
+            SELECT chat_id, sheet_name, table_link
+            FROM chats
+            """
+        )
+        for row in rows:
+            chats.append({
+                "chat_id": row["chat_id"],
+                "sheet_name": row["sheet_name"],
+                "table_link": row["table_link"],
+            })
+    return chats
