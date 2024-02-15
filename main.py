@@ -753,6 +753,8 @@ async def notify():
         alert_message = (
           "У задачи:\n"
           f"{row['info']}\n"
+          f"от {row['date']}\n"
+          f"с дедлайном {row['deadline']}\n"
           f"Изменился статус на {row['status']}"
         )
         print(alert_message)

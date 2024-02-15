@@ -115,23 +115,25 @@ async def fetch_rows_from_sheet(sheet_url, sheet_name):
         print(f"Лист {sheet_name} не найден.")
         return []
 
-    # Получение значений столбцов
     try:
         ids = sheet.col_values(1)
+        dates = sheet.col_values(2)
+        deadlines = sheet.col_values(4)
         infos = sheet.col_values(6)
         statuses = sheet.col_values(9)
     except Exception as e:
         print(f"Произошла ошибка при получении данных из листа: {e}")
         return []
 
-    # Определение наименьшей длины среди списков, чтобы избежать IndexError
-    min_length = min(len(ids), len(infos), len(statuses))
+    min_length = min(len(ids), len(dates), len(deadlines), len(infos), len(statuses))
 
     rows = []
-    for i in range(1, min_length):  # Начинаем с 1, чтобы пропустить заголовки столбцов, если они есть
+    for i in range(1, min_length):
         type_info = "Неизвестно"
         info = infos[i] if i < len(infos) else ""
         status = statuses[i] if i < len(statuses) else ""
+        date = dates[i] if i < len(dates) else ""
+        deadline = deadlines[i] if i < len(deadlines) and deadlines[i] != "" else "-"
 
         if info.startswith("Инцидент"):
             type_info = "Инцидент"
@@ -142,7 +144,9 @@ async def fetch_rows_from_sheet(sheet_url, sheet_name):
             "id": ids[i],
             "type": type_info,
             "status": status,
-            "info": info
+            "info": info,
+            "date": date,
+            "deadline": deadline,
         }
         rows.append(row_object)
 

@@ -339,7 +339,9 @@ async def update_status_and_fetch_differences(items):
                     "id": item['id'],
                     "type": item['type'],
                     "status": item['status'],
-                    "info": item['info']
+                    "info": item['info'],
+                    "date":  item['date'],
+                    "deadline":  item['deadline'],
                 })
 
         return updated_items
